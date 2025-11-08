@@ -1,0 +1,8 @@
+fun int main()
+    var int a;
+    a = 10;
+    if a < 20 then
+        print(a)
+    endif
+    return(0)
+endfun

@@ -1,0 +1,12 @@
+fun int fib(int n)
+    if n < 2 then
+        return(n)
+    else
+        return(fib(n-1) + fib(n-2))
+    endif
+endfun
+
+fun int main()
+    print(fib(10));
+    return(0)
+endfun

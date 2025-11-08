@@ -1,0 +1,8 @@
+fun int suma(int a, int b, int c)
+    return(a + b + c)
+endfun
+
+fun int main()
+    print(suma(1,2,3));
+    return(0)
+endfun

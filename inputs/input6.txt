@@ -1,0 +1,8 @@
+fun int doble(int x)
+    return(x + x)
+endfun
+
+fun int main()
+    print(doble(21));
+    return(0)
+endfun

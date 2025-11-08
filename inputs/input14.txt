@@ -1,0 +1,17 @@
+fun int fib(int n) 
+    if (n < 2) then
+        return(n)
+    else
+        return(fib(n - 1) + fib(n - 2))
+    endif
+endfun
+
+fun int main()
+    var int x;
+    x=1;
+    while x<50 do
+        print(x);
+        print(fib(x));
+        x = x+1
+        endwhile;
+    return(0)

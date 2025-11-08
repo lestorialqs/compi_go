@@ -1,0 +1,13 @@
+fun int main()
+    var int a, b, c;
+    a = 3;
+    b = 4;
+    if a < b then
+        var int d;
+        d = a + b;
+        print(d)
+    else
+        print(a)
+    endif
+    return(0)
+endfun
