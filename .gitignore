@@ -1,0 +1,39 @@
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Build artifacts
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# Executables and libraries
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.lib
+
+# C/C++ specific
+*.swp
+*.bak
+*.obj
+*.sbr
+*.pch
+*.idb
+*.pdb
+*.ilk
+*.suo
+
+# Operating System Files
+.DS_Store
+Thumbs.db
