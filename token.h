@@ -36,6 +36,18 @@ public:
         ENDWHILE,
         ELSE,
         END,      // Fin de entrada
+
+        PACKAGE,
+        MAIN,
+        CONST,
+        FOR,
+        LBRACE,
+        RBRACE,
+        LT,
+        EQEQ,
+        INC,
+        DEC,
+
         VAR,
         COMA,
         TRUE,

@@ -48,6 +48,22 @@ ostream& operator<<(ostream& outs, const Token& tok) {
         case Token::VAR:    outs << "TOKEN(VAR, \""    << tok.text << "\")"; break;
         case Token::COMA:    outs << "TOKEN(COMA, \""    << tok.text << "\")"; break;
 
+// Reglas adiccionales
+        case Token::PACKAGE: outs << "TOKEN(PACKAGE, \"" << tok.text << "\")"; break;
+        case Token::MAIN:    outs << "TOKEN(MAIN, \""    << tok.text << "\")"; break;
+        case Token::CONST:   outs << "TOKEN(CONST, \""   << tok.text << "\")"; break;
+        case Token::FOR:     outs << "TOKEN(FOR, \""     << tok.text << "\")"; break;
+        case Token::TRUE:    outs << "TOKEN(TRUE, \""    << tok.text << "\")"; break;
+        case Token::FALSE:   outs << "TOKEN(FALSE, \""   << tok.text << "\")"; break;
+        case Token::LBRACE:  outs << "TOKEN(LBRACE, \""  << tok.text << "\")"; break;
+        case Token::RBRACE:  outs << "TOKEN(RBRACE, \""  << tok.text << "\")"; break;
+        case Token::LT:      outs << "TOKEN(LT, \""      << tok.text << "\")"; break;
+        case Token::EQEQ:    outs << "TOKEN(EQEQ, \""    << tok.text << "\")"; break;
+        case Token::INC:     outs << "TOKEN(INC, \""     << tok.text << "\")"; break;
+        case Token::DEC:     outs << "TOKEN(DEC, \""     << tok.text << "\")"; break;
+
+
+
         case Token::FUN:    outs << "TOKEN(FUN, \""    << tok.text << "\")"; break;
         case Token::ENDFUN:    outs << "TOKEN(ENDFUN, \""    << tok.text << "\")"; break;
         case Token::RETURN:    outs << "TOKEN(RETURN, \""    << tok.text << "\")"; break;
