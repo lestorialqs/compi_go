@@ -15,6 +15,9 @@ public:
         MUL,     // *
         DIV,     // /
         POW,     // **
+        EQ,      // ==
+        INC,     // ++
+        DEC,     // --
         LPAREN,  // (
         RPAREN,  // )
         SQRT,    // sqrt

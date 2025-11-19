@@ -29,6 +29,9 @@ ostream& operator<<(ostream& outs, const Token& tok) {
         case Token::MUL:    outs << "TOKEN(MUL, \""    << tok.text << "\")"; break;
         case Token::DIV:    outs << "TOKEN(DIV, \""    << tok.text << "\")"; break;
         case Token::POW:    outs << "TOKEN(POW, \""    << tok.text << "\")"; break;
+        case Token::EQ:    outs << "TOKEN(EQ, \""    << tok.text << "\")"; break;
+        case Token::INC:    outs << "TOKEN(INC, \""    << tok.text << "\")"; break;
+        case Token::DEC:    outs << "TOKEN(DEC, \""    << tok.text << "\")"; break;
         case Token::LPAREN:    outs << "TOKEN(LPAREN, \""    << tok.text << "\")"; break;
         case Token::RPAREN:    outs << "TOKEN(RPAREN, \""    << tok.text << "\")"; break;
         case Token::SQRT:    outs << "TOKEN(SQRT, \""    << tok.text << "\")"; break;
