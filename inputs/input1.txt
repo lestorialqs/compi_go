@@ -1,10 +1,16 @@
-var int x;
-fun int suma(int a, int b)
-    var int y;
-    y = a + b;
-    return(y)
-endfun
-fun int main()
-    print(suma(2,3));
-    return(0)
-endfun
+package main
+
+import "fmt"
+
+var x int
+func suma(a int, b int) int {
+	var y int
+	y = a + b
+	return y
+}
+
+func main() {
+	fmt.Println(suma(2, 3))
+}
+
+// Expected output: 5

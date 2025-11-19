@@ -1,9 +1,0 @@
-fun int cond(int x)
-    if x < 4 then return(0) else return(1) endif
-endfun
-
-fun int main()
-    print(cond(5));
-    print(cond(3));
-    return(0)
-endfun

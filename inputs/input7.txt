@@ -1,12 +1,16 @@
-fun int fib(int n)
-    if n < 2 then
-        return(n)
-    else
-        return(fib(n-1) + fib(n-2))
-    endif
-endfun
+package main
 
-fun int main()
-    print(fib(10));
-    return(0)
-endfun
+import "fmt"
+
+func main() {
+	var nombres [3]string
+	nombres[0] = "Diego"
+	nombres[1] = "Pablo"
+	nombres[2] = "Fyodor Dostoevsky"
+
+	for i := 0; i <= 2; i++ {
+		fmt.Println(nombres[i][0:2])
+	}
+}
+
+// Expected output: Di, Pa, Fy

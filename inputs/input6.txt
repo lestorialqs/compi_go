@@ -1,8 +1,22 @@
-fun int doble(int x)
-    return(x + x)
-endfun
+package main
 
-fun int main()
-    print(doble(21));
-    return(0)
-endfun
+import "fmt"
+
+type Student struct {
+	id  int
+	age int
+}
+
+func main() {
+	var s1 Student
+	s1.id = 1
+	s1.age = 20
+
+	var s2 Student
+	s2.id = 2
+	s2.age = s1.age + 2
+
+	fmt.Println(s2.age - s1.age)
+}
+
+// Expected output: 2

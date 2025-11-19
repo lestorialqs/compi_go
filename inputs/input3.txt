@@ -1,10 +1,22 @@
-fun int main()
-    var int a;
-    a = 10;
-    if a < 5 then
-        print(1)
-    else
-        print(2)
-    endif
-    return(0)
-endfun
+package main
+
+import "fmt"
+
+func fac(n int) int {
+	if n < 2 {
+		return n
+	} else {
+		return fac(n-1) * n
+	}
+}
+
+func main() {
+	var x int
+	x = 1
+	for x < 20 { // While son For en GO
+		fmt.Println(fac(x))
+		x = x + 1
+	}
+}
+
+// Expected output: 1, 2, 6, 24, 120, 720, 5040, ..., 121645100408832000

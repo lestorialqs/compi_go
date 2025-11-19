@@ -1,8 +1,17 @@
-fun int main()
-    var int a;
-    a = 10;
-    if a < 20 then
-        print(a)
-    endif
-    return(0)
-endfun
+package main
+
+import "fmt"
+
+func op(a int, b int, c int) int {
+	return a + b*c
+}
+
+func main() {
+	var a, b int
+	a = 5
+	b = 4
+
+	fmt.Println(op(a, b, 2))
+}
+
+// Expected output: 13

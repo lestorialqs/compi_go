@@ -1,8 +1,15 @@
-fun int id(int x)
-    return(x)
-endfun
+package main
 
-fun int main()
-    print(id(42));
-    return(0)
-endfun
+import "fmt"
+
+func main() {
+	var a string
+	a = "hola"
+
+	var b string
+	b = "chau"
+
+	fmt.Println(a + b)
+}
+
+// Expected output: holachau
