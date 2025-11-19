@@ -9,8 +9,7 @@ using namespace std;
 // -----------------------------
 // Constructor
 // -----------------------------
-Scanner::Scanner(const char* s): input(s), first(0), current(0) { 
-    }
+Scanner::Scanner(const char* s): input(s), first(0), current(0) {}
 
 // -----------------------------
 // Función auxiliar
@@ -54,47 +53,69 @@ Token* Scanner::nextToken() {
             current++;
         string lexema = input.substr(first, current - first);
         if (lexema=="sqrt") return new Token(Token::SQRT, input, first, current - first);
-        else if (lexema=="print") return new Token(Token::PRINT, input, first, current - first);
+        else if (lexema=="func") return new Token(Token::FUNC, input, first, current - first);
+        else if (lexema=="return") return new Token(Token::RETURN, input, first, current - first);
+        else if (lexema=="fmt") return new Token(Token::FMT, input, first, current - first);
+        else if (lexema=="Println") return new Token(Token::PRINTLN, input, first, current - first);
         else if (lexema=="if") return new Token(Token::IF, input, first, current - first);
-        else if (lexema=="while") return new Token(Token::WHILE, input, first, current - first);
-        else if (lexema=="then") return new Token(Token::THEN, input, first, current - first);
-        else if (lexema=="do") return new Token(Token::DO, input, first, current - first);
-        else if (lexema=="endif") return new Token(Token::ENDIF, input, first, current - first);
-        else if (lexema=="endwhile") return new Token(Token::ENDWHILE, input, first, current - first);
         else if (lexema=="else") return new Token(Token::ELSE, input, first, current - first);
         else if (lexema=="var") return new Token(Token::VAR, input, first, current - first);
         else if (lexema=="true") return new Token(Token::TRUE, input, first, current - first);
         else if (lexema=="false") return new Token(Token::FALSE, input, first, current - first);
-
-        else if (lexema=="fun") return new Token(Token::FUN, input, first, current - first);
-        else if (lexema=="endfun") return new Token(Token::ENDFUN, input, first, current - first);
-        else if (lexema=="return") return new Token(Token::RETURN, input, first, current - first);
-
+        else if (lexema=="package") return new Token(Token::PACKAGE, input, first, current - first);
+        else if (lexema=="import") return new Token(Token::IMPORT, input, first, current - first);
+        else if (lexema=="const") return new Token(Token::CONST, input, first, current - first);
+        else if (lexema=="for") return new Token(Token::FOR, input, first, current - first);
+        else if (lexema=="struct") return new Token(Token::STRUCT, input, first, current - first);
+        else if (lexema=="type") return new Token(Token::TYPE, input, first, current - first);
         else return new Token(Token::ID, input, first, current - first);
     }
     // Operadores
-    else if (strchr("+/-*();=<,", c)) {
+    else if (strchr("+/-*();=<>:{}[].,\"", c)) {
         switch (c) {
-            case '<': token = new Token(Token::LE,  c); break;
             case '+': token = new Token(Token::PLUS,  c); break;
             case '-': token = new Token(Token::MINUS, c); break;
-            case '*': 
-            if (input[current+1]=='*')
-            {
-                current++;
-                token = new Token(Token::POW, input, first, current + 1 - first);
-            }
-            else{
-                token = new Token(Token::MUL,   c);
-            }
+            case '*':
+                if (input[current+1]=='*') {
+                    current++;
+                    token = new Token(Token::POW, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::MUL, c);
+                }
             break;
             case '/': token = new Token(Token::DIV,   c); break;
             case '(': token = new Token(Token::LPAREN,c); break;
             case ')': token = new Token(Token::RPAREN,c); break;
-            case '=': token = new Token(Token::ASSIGN,c); break;
+            case '<':
+                if (input[current+1]=='=') {
+                    current++;
+                    token = new Token(Token::LE, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::LT, c);
+                }
+            case '>':
+                if (input[current+1]=='=') {
+                    current++;
+                    token = new Token(Token::GE, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::GT, c);
+                }
             case ';': token = new Token(Token::SEMICOL,c); break;
-            case ',': token = new Token(Token::COMA,c); break;
-
+            case ':':
+                if (input[current+1]=='=') {
+                    current++;
+                    token = new Token(Token::SASSIGN, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::COLON, c);
+                }
+            case '=': token = new Token(Token::ASSIGN,c); break;
+            case '.': token = new Token(Token::DOT,c); break;
+            case ',': token = new Token(Token::COMMA,c); break;
+            case '"': token = new Token(Token::QUOTE,c); break;
+            case '{': token = new Token(Token::LBRACE,c); break;
+            case '}': token = new Token(Token::RBRACE,c); break;
+            case '[': token = new Token(Token::LBRACK,c); break;
+            case ']': token = new Token(Token::RBRACK,c); break;
         }
         current++;
     }
