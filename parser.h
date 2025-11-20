@@ -15,9 +15,9 @@ private:
 public:
     Parser(Scanner* scanner);       
     Program* parseProgram();
+    VarDec* parseVarDec();
     FunDec* parseFunDec();
     Body* parseBody();
-    VarDec* parseVarDec();
     Stm* parseStm();
     Exp* parseCE();
     Exp* parseBE();

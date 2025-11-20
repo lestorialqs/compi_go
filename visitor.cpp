@@ -14,7 +14,6 @@ int NumberExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
-
 int Program::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
@@ -22,7 +21,6 @@ int Program::accept(Visitor* visitor) {
 int IdExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
-
 
 int PrintStm::accept(Visitor* visitor) {
     return visitor->visit(this);
@@ -36,7 +34,7 @@ int IfStm::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
-int WhileStm::accept(Visitor* visitor) {
+int ForWhileStm::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
@@ -60,6 +58,21 @@ int ReturnStm::accept(Visitor* visitor){
     return visitor->visit(this);
 }
 
+int ForStm::accept(Visitor *visitor) {
+    return visitor->visit(this);
+}
+
+int ShortAssignStm::accept(Visitor *visitor) {
+    return visitor->visit(this);
+}
+
+int IncStm::accept(Visitor *visitor) {
+    return visitor->visit(this);
+}
+
+int DecStm::accept(Visitor *visitor) {
+    return visitor->visit(this);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -69,7 +82,7 @@ int GenCodeVisitor::generar(Program* program) {
 }
 
 int GenCodeVisitor::visit(Program* program) {
-out << ".data\nprint_fmt: .string \"%ld \\n\""<<endl;
+    out << ".data\nprint_fmt: .string \"%ld \\n\""<<endl;
 
     for (auto dec : program->vdlist){
         dec->accept(this);
@@ -126,11 +139,19 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
         case PLUS_OP:  out << " addq %rcx, %rax\n"; break;
         case MINUS_OP: out << " subq %rcx, %rax\n"; break;
         case MUL_OP:   out << " imulq %rcx, %rax\n"; break;
+        case LT_OP:
+            break;
         case LE_OP:
             out << " cmpq %rcx, %rax\n"
                       << " movl $0, %eax\n"
                       << " setle %al\n"
                       << " movzbq %al, %rax\n";
+            break;
+        case GT_OP:
+            break;
+        case GE_OP:
+            break;
+        case EQ_OP:
             break;
     }
     return 0;
@@ -156,8 +177,6 @@ int GenCodeVisitor::visit(PrintStm* stm) {
             return 0;
 }
 
-
-
 int GenCodeVisitor::visit(Body* b) {
     for (auto dec : b->declarations){
         dec->accept(this);
@@ -173,7 +192,7 @@ int GenCodeVisitor::visit(IfStm* stm) {
     stm->condition->accept(this);
     out << " cmpq $0, %rax"<<endl;
     out << " je else_" << label << endl;
-   stm->then->accept(this);
+    stm->then->accept(this);
     out << " jmp endif_" << label << endl;
     out << " else_" << label << ":"<< endl;
     if (stm->els) stm->els->accept(this);
@@ -181,7 +200,7 @@ int GenCodeVisitor::visit(IfStm* stm) {
     return 0;
 }
 
-int GenCodeVisitor::visit(WhileStm* stm) {
+int GenCodeVisitor::visit(ForWhileStm* stm) {
     int label = labelcont++;
     out << "while_" << label << ":"<<endl;
     stm->condition->accept(this);
@@ -239,5 +258,21 @@ int GenCodeVisitor::visit(FcallExp* exp) {
         out << " mov %rax, " << argRegs[i] <<endl;
     }
     out << "call " << exp->nombre << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(ForStm *fs) {
+    return 0;
+}
+
+int GenCodeVisitor::visit(DecStm *stm) {
+    return 0;
+}
+
+int GenCodeVisitor::visit(IncStm *stm) {
+    return 0;
+}
+
+int GenCodeVisitor::visit(ShortAssignStm *stm) {
     return 0;
 }

@@ -73,8 +73,22 @@ Token* Scanner::nextToken() {
     // Operadores
     else if (strchr("+/-*();=<>:{}[].,\"", c)) {
         switch (c) {
-            case '+': token = new Token(Token::PLUS,  c); break;
-            case '-': token = new Token(Token::MINUS, c); break;
+            case '+':
+                if (input[current+1]=='+') {
+                    current++;
+                    token = new Token(Token::INC, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::PLUS, c);
+                }
+            break;
+            case '-':
+                if (input[current+1]=='-') {
+                    current++;
+                    token = new Token(Token::DEC, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::MINUS, c);
+                }
+            break;
             case '*':
                 if (input[current+1]=='*') {
                     current++;
@@ -93,6 +107,7 @@ Token* Scanner::nextToken() {
                 } else {
                     token = new Token(Token::LT, c);
                 }
+            break;
             case '>':
                 if (input[current+1]=='=') {
                     current++;
@@ -100,6 +115,7 @@ Token* Scanner::nextToken() {
                 } else {
                     token = new Token(Token::GT, c);
                 }
+            break;
             case ';': token = new Token(Token::SEMICOL,c); break;
             case ':':
                 if (input[current+1]=='=') {
@@ -108,7 +124,15 @@ Token* Scanner::nextToken() {
                 } else {
                     token = new Token(Token::COLON, c);
                 }
-            case '=': token = new Token(Token::ASSIGN,c); break;
+            break;
+            case '=':
+                if (input[current+1]=='=') {
+                    current++;
+                    token = new Token(Token::EQ, input, first, current + 1 - first);
+                } else {
+                    token = new Token(Token::ASSIGN, c);
+                }
+            break;
             case '.': token = new Token(Token::DOT,c); break;
             case ',': token = new Token(Token::COMMA,c); break;
             case '"': token = new Token(Token::QUOTE,c); break;
