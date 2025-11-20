@@ -101,11 +101,16 @@ FunDec *Parser::parseFunDec() {
     fd->nombre = previous->text;
     match(Token::LPAREN);
     if(check(Token::ID)) {
-        while(match(Token::ID)) {
+        match(Token::ID);
+        fd->Pnombres.push_back(previous->text);
+        match(Token::ID);
+        fd->Ptipos.push_back(previous->text);
+
+        while(match(Token::COMMA)) {
+            match(Token::ID);
             fd->Pnombres.push_back(previous->text);
             match(Token::ID);
             fd->Ptipos.push_back(previous->text);
-            match(Token::COMMA);
         }
     }
     match(Token::RPAREN);
@@ -127,11 +132,11 @@ Body* Parser::parseBody(){
             b->declarations.push_back(parseVarDec());
         }
     }
-    b->StmList.push_back(parseStm());
-    while(match(Token::SEMICOL)) {
+
+    while (check(Token::ID) || check(Token::FMT) || check(Token::RETURN) || check(Token::IF) || check(Token::FOR)) {
         b->StmList.push_back(parseStm());
+        match(Token::SEMICOL);
     }
-    // match(Token::SEMICOL);
     return b;
 }
 
