@@ -299,11 +299,21 @@ int GenCodeVisitor::visit(ForStm *fs) {
     return 0;
 }
 
-int GenCodeVisitor::visit(DecStm *stm) {
+int GenCodeVisitor::visit(IncStm *stm) {
+    if (env.check(stm->id)) {
+        out << " movq " << env.lookup(stm->id) << "(%rbp), %rax"<<endl;
+        out << " addq $1, %rax" << endl;
+        out << " movq %rax, " << env.lookup(stm->id) << "(%rbp)"<<endl;
+    }
     return 0;
 }
 
-int GenCodeVisitor::visit(IncStm *stm) {
+int GenCodeVisitor::visit(DecStm *stm) {
+    if (env.check(stm->id)) {
+        out << " movq " << env.lookup(stm->id) << "(%rbp), %rax"<<endl;
+        out << " subq $1, %rax" << endl;
+        out << " movq %rax, " << env.lookup(stm->id) << "(%rbp)"<<endl;
+    }
     return 0;
 }
 

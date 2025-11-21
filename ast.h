@@ -125,7 +125,7 @@ public:
 class IncStm: public Stm {
 public:
     string id;
-    IncStm(string) {};
+    IncStm(string);
     ~IncStm() {};
     int accept(Visitor* visitor);
 };
@@ -133,7 +133,7 @@ public:
 class DecStm: public Stm {
 public:
     string id;
-    DecStm(string) {};
+    DecStm(string);
     ~DecStm() {};
     int accept(Visitor* visitor);
 };
