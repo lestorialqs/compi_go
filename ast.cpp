@@ -68,6 +68,14 @@ ShortAssignStm::ShortAssignStm(string variable,Exp* expresion){
     e = expresion;
 }
 
+IncStm::IncStm(string var) {
+    id = var;
+}
+
+DecStm::DecStm(string var) {
+    id = var;
+}
+
 VarDec::VarDec() {}
 
 VarDec::~VarDec() {}
