@@ -4,8 +4,8 @@ import "fmt"
 
 var x int
 func suma(a int, b int) int {
-	var y int
-	y = a + b
+	var y int;
+	y = a + b;
 	return y
 }
 

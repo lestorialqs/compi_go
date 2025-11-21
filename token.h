@@ -15,31 +15,46 @@ public:
         MUL,     // *
         DIV,     // /
         POW,     // **
+        EQ,      // ==
+        INC,     // ++
+        DEC,     // --
         LPAREN,  // (
         RPAREN,  // )
         SQRT,    // sqrt
         NUM,     // Número
         ERR,     // Error
         ID,      // ID
-        LE,
-        FUN,
-        ENDFUN,
-        RETURN,
-        SEMICOL,    
-        ASSIGN,
-        PRINT,
-        IF,
-        WHILE,
-        DO,
-        THEN,
-        ENDIF,
-        ENDWHILE,
-        ELSE,
-        END,      // Fin de entrada
-        VAR,
-        COMA,
-        TRUE,
-        FALSE
+        LT,      // <
+        LE,      // <=
+        GT,      // >
+        GE,      // >=
+        FUNC,    // func
+        RETURN,  // return
+        SEMICOL, // ;
+        COLON,   // :
+        ASSIGN,  // =
+        SASSIGN, // :=
+        FMT,     // fmt
+        DOT,     // .
+        PRINTLN, // Println
+        IF,      // if
+        ELSE,    // else
+        VAR,     // var
+        COMMA,   // ,
+        TRUE,    // true
+        FALSE,   // false
+        PACKAGE, // package
+        IMPORT,  // import
+        QUOTE,   // "
+        CONST,   // const
+        FOR,     // for
+        LBRACE,  // {
+        RBRACE,  // }
+        LBRACK,  // [
+        RBRACK,  // ]
+        STRUCT,  // struct
+        TYPE,    // type
+        END,     // Fin de entrada
     };
 
     // Atributos

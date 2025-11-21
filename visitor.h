@@ -5,13 +5,15 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+
+#include "environment.h"
 using namespace std;
 
 class BinaryExp;
 class NumberExp;
 class Program;
 class PrintStm;
-class WhileStm;
+class ForWhileStm;
 class IfStm;
 class AssignStm;
 class Body;
@@ -19,17 +21,22 @@ class Vardec;
 class FcallExp;
 class ReturnStm;
 class FunDec;
+class ForStm;
+class ShortAssignStm;
+class IncStm;
+class DecStm;
+class StringExp;
 
+static Environment<int> env;
 
 class Visitor {
 public:
-    // 
     virtual int visit(BinaryExp* exp) = 0;
     virtual int visit(NumberExp* exp) = 0;
     virtual int visit(IdExp* exp) = 0;
     virtual int visit(Program* p) = 0;
     virtual int visit(PrintStm* stm) = 0;
-    virtual int visit(WhileStm* stm) = 0;
+    virtual int visit(ForWhileStm* stm) = 0;
     virtual int visit(IfStm* stm) = 0;
     virtual int visit(AssignStm* stm) = 0;
     virtual int visit(Body* body) = 0;
@@ -37,8 +44,39 @@ public:
     virtual int visit(FcallExp* fcall) = 0;
     virtual int visit(ReturnStm* r) = 0;
     virtual int visit(FunDec* fd) = 0;
+    virtual int visit(ForStm* fs) = 0;
+    virtual int visit(ShortAssignStm* stm) = 0;
+    virtual int visit(IncStm* stm) = 0;
+    virtual int visit(DecStm* stm) = 0;
+    virtual int visit(StringExp* exp) = 0;
 };
 
+class TypeCheckerVisitor : public Visitor {
+public:
+    unordered_map<string,int> fun_locales;
+    std::unordered_map<string, string> stringIds;
+    int stringCont = 0;
+    int locales;
+    int type(Program* program);
+    int visit(BinaryExp* exp) override;
+    int visit(NumberExp* exp) override;
+    int visit(IdExp* exp) override;
+    int visit(Program* p) override ;
+    int visit(PrintStm* stm) override;
+    int visit(AssignStm* stm) override;
+    int visit(ForWhileStm* stm) override;
+    int visit(IfStm* stm) override;
+    int visit(Body* body) override;
+    int visit(VarDec* vd) override;
+    int visit(FcallExp* fcall) override;
+    int visit(ReturnStm* r) override;
+    int visit(FunDec* fd) override;
+    int visit(ForStm* fs) override;
+    int visit(ShortAssignStm* stm) override;
+    int visit(IncStm* stm) override;
+    int visit(DecStm* stm) override;
+    int visit(StringExp* exp) override;
+};
 
 class GenCodeVisitor : public Visitor {
 private:
@@ -46,8 +84,10 @@ private:
 public:
     GenCodeVisitor(std::ostream& out) : out(out) {}
     int generar(Program* program);
-    unordered_map<string, int> memoria;
     unordered_map<string, bool> memoriaGlobal;
+    unordered_map<string,int> fun_reserva;
+    std::unordered_map<string, string> stringIds;
+    TypeCheckerVisitor type;
     int offset = -8;
     int labelcont = 0;
     bool entornoFuncion = false;
@@ -58,13 +98,18 @@ public:
     int visit(Program* p) override ;
     int visit(PrintStm* stm) override;
     int visit(AssignStm* stm) override;
-    int visit(WhileStm* stm) override;
+    int visit(ForWhileStm* stm) override;
     int visit(IfStm* stm) override;
     int visit(Body* body) override;
     int visit(VarDec* vd) override;
     int visit(FcallExp* fcall) override;
     int visit(ReturnStm* r) override;
     int visit(FunDec* fd) override;
+    int visit(ForStm* fs) override;
+    int visit(ShortAssignStm* stm) override;
+    int visit(IncStm* stm) override;
+    int visit(DecStm* stm) override;
+    int visit(StringExp* exp) override;
 };
 
 #endif // VISITOR_H

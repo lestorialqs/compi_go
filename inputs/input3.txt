@@ -11,10 +11,10 @@ func fac(n int) int {
 }
 
 func main() {
-	var x int
-	x = 1
+	var x int;
+	x = 1;
 	for x < 20 { // While son For en GO
-		fmt.Println(fac(x))
+		fmt.Println(fac(x));
 		x = x + 1
 	}
 }

@@ -13,7 +13,11 @@ string Exp::binopToChar(BinaryOp op) {
         case MUL_OP:   return "*";
         case DIV_OP:   return "/";
         case POW_OP:   return "**";
-        case LE_OP:   return "<";
+        case LE_OP:   return "<=";
+        case LT_OP:   return "<";
+        case GT_OP:   return ">";
+        case GE_OP:   return ">=";
+        case EQ_OP:   return "==";
         default:       return "?";
     }
 }
@@ -27,8 +31,6 @@ BinaryExp::~BinaryExp() {
     delete left;
     delete right;
 }
-
-
 
 // ------------------ NumberExp ------------------
 NumberExp::NumberExp(int v) : value(v) {}
@@ -48,10 +50,9 @@ PrintStm::~PrintStm(){}
 
 AssignStm::~AssignStm(){}
 
+ShortAssignStm::~ShortAssignStm(){}
+
 IfStm::IfStm(Exp* c, Body* t, Body* e): condition(c), then(t), els(e) {}
-
-WhileStm::WhileStm(Exp* c, Body* t): condition(c), b(t) {}
-
 
 PrintStm::PrintStm(Exp* expresion){
     e=expresion;
@@ -62,7 +63,18 @@ AssignStm::AssignStm(string variable,Exp* expresion){
     e = expresion;
 }
 
+ShortAssignStm::ShortAssignStm(string variable,Exp* expresion){
+    id = variable;
+    e = expresion;
+}
 
+IncStm::IncStm(string var) {
+    id = var;
+}
+
+DecStm::DecStm(string var) {
+    id = var;
+}
 
 VarDec::VarDec() {}
 
@@ -74,5 +86,10 @@ Body::Body(){
 }
 
 Body::~Body(){}
+
+StringExp::StringExp(string val) {
+    value = val;
+}
+
 
 

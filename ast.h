@@ -12,12 +12,16 @@ class VarDec;
 
 // Operadores binarios soportados
 enum BinaryOp { 
-    PLUS_OP, 
-    MINUS_OP, 
-    MUL_OP, 
+    PLUS_OP,
+    MINUS_OP,
+    MUL_OP,
     DIV_OP,
     POW_OP,
-    LE_OP
+    LT_OP,
+    LE_OP,
+    GT_OP,
+    GE_OP,
+    EQ_OP
 };
 
 // Clase abstracta Exp
@@ -37,7 +41,6 @@ public:
     int accept(Visitor* visitor);
     BinaryExp(Exp* l, Exp* r, BinaryOp op);
     ~BinaryExp();
-
 };
 
 // Expresión numérica
@@ -58,14 +61,13 @@ public:
     ~IdExp();
 };
 
-
-class Stm{
+class Stm {
 public:
     virtual int accept(Visitor* visitor) = 0;
     virtual ~Stm() = 0;
 };
 
-class VarDec{
+class VarDec {
 public:
     string type;
     list<string> vars;
@@ -74,8 +76,7 @@ public:
     ~VarDec();
 };
 
-
-class Body{
+class Body {
 public:
     list<Stm*> StmList;
     list<VarDec*> declarations;
@@ -83,9 +84,6 @@ public:
     Body();
     ~Body();
 };
-
-
-
 
 class IfStm: public Stm {
 public:
@@ -97,16 +95,14 @@ public:
     ~IfStm(){};
 };
 
-class WhileStm: public Stm {
+class ForWhileStm: public Stm {
 public:
     Exp* condition;
     Body* b;
-    WhileStm(Exp* condition, Body* b);
+    ForWhileStm(){};
     int accept(Visitor* visitor);
-    ~WhileStm(){};
+    ~ForWhileStm(){};
 };
-
-
 
 class AssignStm: public Stm {
 public:
@@ -117,6 +113,31 @@ public:
     int accept(Visitor* visitor);
 };
 
+class ShortAssignStm: public Stm {
+public:
+    string id;
+    Exp* e;
+    ShortAssignStm(string, Exp*);
+    ~ShortAssignStm();
+    int accept(Visitor* visitor);
+};
+
+class IncStm: public Stm {
+public:
+    string id;
+    IncStm(string);
+    ~IncStm() {};
+    int accept(Visitor* visitor);
+};
+
+class DecStm: public Stm {
+public:
+    string id;
+    DecStm(string);
+    ~DecStm() {};
+    int accept(Visitor* visitor);
+};
+
 class PrintStm: public Stm {
 public:
     Exp* e;
@@ -124,11 +145,6 @@ public:
     ~PrintStm();
     int accept(Visitor* visitor);
 };
-
-
-
-
-
 
 class ReturnStm: public Stm {
 public:
@@ -147,10 +163,15 @@ public:
     ~FcallExp(){};
 };
 
+class StringExp : public Exp {
+public:
+    string value;
+    int accept(Visitor* visitor);
+    StringExp(string);
+    ~StringExp() {};
+};
 
-
-
-class FunDec{
+class FunDec {
 public:
     string nombre;
     string tipo;
@@ -162,7 +183,19 @@ public:
     ~FunDec(){};
 };
 
-class Program{
+class ForStm: public Stm {
+public:
+    string var;
+    Stm* initial;
+    Exp* condition;
+    Stm* adder;
+    Body* b;
+    ForStm(){};
+    ~ForStm(){};
+    int accept(Visitor* visitor);
+};
+
+class Program {
 public:
     list<VarDec*> vdlist;
     list<FunDec*> fdlist;
@@ -170,7 +203,5 @@ public:
     ~Program(){};
     int accept(Visitor* visitor);
 };
-
-
 
 #endif // AST_H
