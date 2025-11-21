@@ -3,10 +3,10 @@ package main
 import "fmt"
 
 func main() {
-	var nombres [3]string
-	nombres[0] = "Diego"
-	nombres[1] = "Pablo"
-	nombres[2] = "Fyodor Dostoevsky"
+	var nombres [3]string;
+	nombres[0] = "Diego";
+	nombres[1] = "Pablo";
+	nombres[2] = "Fyodor Dostoevsky";
 
 	for i := 0; i <= 2; i++ {
 		fmt.Println(nombres[i][0:2])
