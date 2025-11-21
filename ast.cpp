@@ -87,4 +87,9 @@ Body::Body(){
 
 Body::~Body(){}
 
+StringExp::StringExp(string val) {
+    value = val;
+}
+
+
 

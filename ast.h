@@ -163,6 +163,14 @@ public:
     ~FcallExp(){};
 };
 
+class StringExp : public Exp {
+public:
+    string value;
+    int accept(Visitor* visitor);
+    StringExp(string);
+    ~StringExp() {};
+};
+
 class FunDec {
 public:
     string nombre;
