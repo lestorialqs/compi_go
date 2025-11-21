@@ -74,18 +74,28 @@ int DecStm::accept(Visitor *visitor) {
     return visitor->visit(this);
 }
 
+int StringExp::accept(Visitor *visitor) {
+    return visitor->visit(this);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 int GenCodeVisitor::generar(Program* program) {
     env.add_level();
     type.type(program);
     fun_reserva = type.fun_locales;
+    stringIds = type.stringIds;
     program->accept(this);
         return 0;
 }
 
 int GenCodeVisitor::visit(Program* program) {
     out << ".data\nprint_fmt: .string \"%ld \\n\""<<endl;
+    out << "string_fmt: .string \"%s \\n\""<<endl;
+
+    for (auto& [id, str] : stringIds) {
+        out << str << ": .string \""<< id << "\"" << endl;
+    }
 
     for (auto dec : program->vdlist){
         dec->accept(this);
@@ -192,9 +202,10 @@ int GenCodeVisitor::visit(PrintStm* stm) {
     out <<
         " movq %rax, %rsi\n"
         " leaq print_fmt(%rip), %rdi\n"
+        // "leaq string_fmt(%rip), %rdi\n"    TODO: ADD TYPES TO DETERMINE WHICH PRINT FORMAT TO USE
         " movl $0, %eax\n"
         " call printf@PLT\n";
-            return 0;
+    return 0;
 }
 
 int GenCodeVisitor::visit(Body* b) {
@@ -328,6 +339,13 @@ int GenCodeVisitor::visit(ShortAssignStm *stm) {
     return 0;
 }
 
+int GenCodeVisitor::visit(StringExp *exp) {
+    if (stringIds.count(exp->value)) {
+        out << " leaq " << stringIds[exp->value] << "(%rip), %rax" << endl;
+    }
+    return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 int TypeCheckerVisitor::type(Program *program) {
@@ -399,10 +417,12 @@ int TypeCheckerVisitor::visit(Program *p) {
 }
 
 int TypeCheckerVisitor::visit(PrintStm *stm) {
+    stm->e->accept(this);
     return 0;
 }
 
 int TypeCheckerVisitor::visit(AssignStm *stm) {
+    stm->e->accept(this);
     return 0;
 }
 
@@ -411,6 +431,7 @@ int TypeCheckerVisitor::visit(FcallExp *fcall) {
 }
 
 int TypeCheckerVisitor::visit(ReturnStm *r) {
+    r->e->accept(this);
     return 0;
 }
 
@@ -426,6 +447,14 @@ int TypeCheckerVisitor::visit(ShortAssignStm *stm) {
     return 0;
 }
 
-
-
+int TypeCheckerVisitor::visit(StringExp *exp) {
+    string id;
+    if (stringIds.count(exp->value)) {
+        id = stringIds[exp->value];
+    } else {
+        id = ".L.str_" + to_string(stringCont++);
+        stringIds[exp->value] = id;
+    }
+    return 0;
+}
 

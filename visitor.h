@@ -25,6 +25,7 @@ class ForStm;
 class ShortAssignStm;
 class IncStm;
 class DecStm;
+class StringExp;
 
 static Environment<int> env;
 
@@ -47,11 +48,14 @@ public:
     virtual int visit(ShortAssignStm* stm) = 0;
     virtual int visit(IncStm* stm) = 0;
     virtual int visit(DecStm* stm) = 0;
+    virtual int visit(StringExp* exp) = 0;
 };
 
 class TypeCheckerVisitor : public Visitor {
 public:
     unordered_map<string,int> fun_locales;
+    std::unordered_map<string, string> stringIds;
+    int stringCont = 0;
     int locales;
     int type(Program* program);
     int visit(BinaryExp* exp) override;
@@ -71,6 +75,7 @@ public:
     int visit(ShortAssignStm* stm) override;
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
+    int visit(StringExp* exp) override;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -81,6 +86,7 @@ public:
     int generar(Program* program);
     unordered_map<string, bool> memoriaGlobal;
     unordered_map<string,int> fun_reserva;
+    std::unordered_map<string, string> stringIds;
     TypeCheckerVisitor type;
     int offset = -8;
     int labelcont = 0;
@@ -103,6 +109,7 @@ public:
     int visit(ShortAssignStm* stm) override;
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
+    int visit(StringExp* exp) override;
 };
 
 #endif // VISITOR_H
