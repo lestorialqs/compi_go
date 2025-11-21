@@ -90,7 +90,7 @@ VarDec* Parser::parseVarDec() {
     }
     match(Token::ID);
     vd->type = previous->text;
-    match(Token::SEMICOL);
+    // match(Token::SEMICOL);  <-- REMOVED SEMICOL FOR TESTING
     return vd;
 }
 
@@ -128,14 +128,15 @@ Body* Parser::parseBody(){
 
     if(check(Token::VAR)) {
         b->declarations.push_back(parseVarDec());
-        while(check(Token::VAR)) {
-            b->declarations.push_back(parseVarDec());
+        while(match(Token::SEMICOL)) {
+            if(check(Token::VAR)) {
+                b->declarations.push_back(parseVarDec());
+            }
         }
     }
-
-    while (check(Token::ID) || check(Token::FMT) || check(Token::RETURN) || check(Token::IF) || check(Token::FOR)) {
+    b->StmList.push_back(parseStm());
+    while(match(Token::SEMICOL)) {
         b->StmList.push_back(parseStm());
-        match(Token::SEMICOL);
     }
     return b;
 }
@@ -187,25 +188,17 @@ Stm* Parser::parseStm() {
     }
     // for i := 0; i <= 2; i++
     else if (match(Token::FOR)) {
-        if (check(Token::ID)) {
-            ForStm* st = new ForStm();
-            st->initial = parseStm();
-            match(Token::SEMICOL);
-            st->condition = parseCE();
-            match(Token::SEMICOL);
-            st->adder = parseStm();
-            match(Token::LBRACE);
-            st->b = parseBody();
-            match(Token::RBRACE);
-            return st;
-        } else {
-            ForWhileStm* st = new ForWhileStm();
-            st->condition = parseCE();
-            match(Token::LBRACE);
-            st->b = parseBody();
-            match(Token::RBRACE);
-            return st;
-        }
+        ForStm* st = new ForStm();
+        st->var = current->text;
+        st->initial = parseStm();
+        match(Token::SEMICOL);
+        st->condition = parseCE();
+        match(Token::SEMICOL);
+        st->adder = parseStm();
+        match(Token::LBRACE);
+        st->b = parseBody();
+        match(Token::RBRACE);
+        return st;
     }
     else{
         throw runtime_error("Error sintáctico");

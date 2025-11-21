@@ -50,6 +50,8 @@ PrintStm::~PrintStm(){}
 
 AssignStm::~AssignStm(){}
 
+ShortAssignStm::~ShortAssignStm(){}
+
 IfStm::IfStm(Exp* c, Body* t, Body* e): condition(c), then(t), els(e) {}
 
 PrintStm::PrintStm(Exp* expresion){
@@ -57,6 +59,11 @@ PrintStm::PrintStm(Exp* expresion){
 }
 
 AssignStm::AssignStm(string variable,Exp* expresion){
+    id = variable;
+    e = expresion;
+}
+
+ShortAssignStm::ShortAssignStm(string variable,Exp* expresion){
     id = variable;
     e = expresion;
 }

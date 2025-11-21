@@ -117,8 +117,8 @@ class ShortAssignStm: public Stm {
 public:
     string id;
     Exp* e;
-    ShortAssignStm(string, Exp*) {};
-    ~ShortAssignStm() {};
+    ShortAssignStm(string, Exp*);
+    ~ShortAssignStm();
     int accept(Visitor* visitor);
 };
 

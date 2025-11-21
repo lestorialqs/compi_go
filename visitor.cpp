@@ -308,6 +308,13 @@ int GenCodeVisitor::visit(IncStm *stm) {
 }
 
 int GenCodeVisitor::visit(ShortAssignStm *stm) {
+    stm->e->accept(this);
+    if (memoriaGlobal.count(stm->id))
+        out << " movq %rax, " << stm->id << "(%rip)"<<endl;
+    else
+        if (env.check(stm->id)) {
+            out << " movq %rax, " << env.lookup(stm->id) << "(%rbp)"<<endl;
+        }
     return 0;
 }
 

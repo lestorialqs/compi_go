@@ -19,8 +19,8 @@ def clean_input(file_path):
                 lines.append("")
                 continue
 
-            if not (line.endswith("{") or line.endswith("}") or line.endswith(";")):
-                line = line.rstrip() + ";"
+            #if not (line.endswith("{") or line.endswith("}") or line.endswith(";")):
+            #    line = line.rstrip() + ";"
 
             lines.append(line)
 
