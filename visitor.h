@@ -5,6 +5,8 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+
+#include "environment.h"
 using namespace std;
 
 class BinaryExp;
@@ -23,6 +25,8 @@ class ForStm;
 class ShortAssignStm;
 class IncStm;
 class DecStm;
+
+static Environment<int> env;
 
 class Visitor {
 public:
@@ -45,14 +49,39 @@ public:
     virtual int visit(DecStm* stm) = 0;
 };
 
+class TypeCheckerVisitor : public Visitor {
+public:
+    unordered_map<string,int> fun_locales;
+    int locales;
+    int type(Program* program);
+    int visit(BinaryExp* exp) override;
+    int visit(NumberExp* exp) override;
+    int visit(IdExp* exp) override;
+    int visit(Program* p) override ;
+    int visit(PrintStm* stm) override;
+    int visit(AssignStm* stm) override;
+    int visit(ForWhileStm* stm) override;
+    int visit(IfStm* stm) override;
+    int visit(Body* body) override;
+    int visit(VarDec* vd) override;
+    int visit(FcallExp* fcall) override;
+    int visit(ReturnStm* r) override;
+    int visit(FunDec* fd) override;
+    int visit(ForStm* fs) override;
+    int visit(ShortAssignStm* stm) override;
+    int visit(IncStm* stm) override;
+    int visit(DecStm* stm) override;
+};
+
 class GenCodeVisitor : public Visitor {
 private:
     std::ostream& out;
 public:
     GenCodeVisitor(std::ostream& out) : out(out) {}
     int generar(Program* program);
-    unordered_map<string, int> memoria;
     unordered_map<string, bool> memoriaGlobal;
+    unordered_map<string,int> fun_reserva;
+    TypeCheckerVisitor type;
     int offset = -8;
     int labelcont = 0;
     bool entornoFuncion = false;

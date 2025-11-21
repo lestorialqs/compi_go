@@ -185,6 +185,7 @@ Stm* Parser::parseStm() {
         }
         a = new IfStm(e, tb, fb);
     }
+    // for i := 0; i <= 2; i++
     else if (match(Token::FOR)) {
         if (check(Token::ID)) {
             ForStm* st = new ForStm();
