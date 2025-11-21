@@ -286,6 +286,18 @@ Exp* Parser::parseF() {
     else if (match(Token::FALSE)) {
         return new NumberExp(0);
     }
+    else if (match(Token::QUOTE)) {
+        string str = "";
+        match(Token::ID);
+        str.append(previous->text);
+        while (match(Token::ID)) {
+            str.append(" ");
+            str.append(previous->text);
+        }
+        e = new StringExp(str);
+        match(Token::QUOTE);
+        return e;
+    }
     else if (match(Token::LPAREN))
     {
         e = parseCE();
