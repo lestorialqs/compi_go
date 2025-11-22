@@ -82,9 +82,8 @@ int StringExp::accept(Visitor *visitor) {
 
 int GenCodeVisitor::generar(Program* program) {
     env.add_level();
-    type.type(program);
-    fun_reserva = type.fun_locales;
-    stringIds = type.stringIds;
+    typeChecker.type(program);
+    fun_reserva = typeChecker.fun_locales;
     program->accept(this);
         return 0;
 }
@@ -93,7 +92,7 @@ int GenCodeVisitor::visit(Program* program) {
     out << ".data\nprint_fmt: .string \"%ld \\n\""<<endl;
     out << "string_fmt: .string \"%s \\n\""<<endl;
 
-    for (auto& [id, str] : stringIds) {
+    for (auto& [id, str] : typeChecker.stringIds) {
         out << str << ": .string \""<< id << "\"" << endl;
     }
 
@@ -187,6 +186,7 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
 }
 
 int GenCodeVisitor::visit(AssignStm* stm) {
+    // WARNING: Asume que el tipo se mantiene
     stm->e->accept(this);
     if (memoriaGlobal.count(stm->id))
         out << " movq %rax, " << stm->id << "(%rip)"<<endl;
@@ -199,12 +199,19 @@ int GenCodeVisitor::visit(AssignStm* stm) {
 
 int GenCodeVisitor::visit(PrintStm* stm) {
     stm->e->accept(this);
-    out <<
-        " movq %rax, %rsi\n"
-        " leaq print_fmt(%rip), %rdi\n"
-        // "leaq string_fmt(%rip), %rdi\n"    TODO: ADD TYPES TO DETERMINE WHICH PRINT FORMAT TO USE
-        " movl $0, %eax\n"
-        " call printf@PLT\n";
+    if (stm->e->type == STRING) {
+        out <<
+            " movq %rax, %rsi\n"
+            " leaq string_fmt(%rip), %rdi\n"
+            " movl $0, %eax\n"
+            " call printf@PLT\n";
+    } else {
+        out <<
+            " movq %rax, %rsi\n"
+            " leaq print_fmt(%rip), %rdi\n"
+            " movl $0, %eax\n"
+            " call printf@PLT\n";
+    }
     return 0;
 }
 
@@ -340,8 +347,8 @@ int GenCodeVisitor::visit(ShortAssignStm *stm) {
 }
 
 int GenCodeVisitor::visit(StringExp *exp) {
-    if (stringIds.count(exp->value)) {
-        out << " leaq " << stringIds[exp->value] << "(%rip), %rax" << endl;
+    if (typeChecker.stringIds.count(exp->value)) {
+        out << " leaq " << typeChecker.stringIds[exp->value] << "(%rip), %rax" << endl;
     }
     return 0;
 }
@@ -365,6 +372,8 @@ int TypeCheckerVisitor::visit(FunDec *fd) {
 }
 
 int TypeCheckerVisitor::visit(Body *body) {
+    typeEnv.add_level();
+
     for (auto i:body->declarations) {
         i->accept(this);
     }
@@ -372,10 +381,21 @@ int TypeCheckerVisitor::visit(Body *body) {
     for(auto i:body->StmList) {
         i->accept(this);
     }
+
+    typeEnv.remove_level();
     return 0;
 }
 
 int TypeCheckerVisitor::visit(VarDec *vd) {
+    Type type = UNDEFINED;
+
+    if (vd->type == "int") type = INT;
+    else if (vd->type == "bool") type = BOOL;
+    else if (vd->type == "string") type = STRING;
+
+    for (auto &v : vd->vars)
+        typeEnv.add_var(v, type);
+
     locales += vd->vars.size();
     return 0;
 }
@@ -401,14 +421,46 @@ int TypeCheckerVisitor::visit(ForWhileStm *stm) {
 }
 
 int TypeCheckerVisitor::visit(BinaryExp *exp) {
+    exp->left->accept(this);
+    exp->right->accept(this);
+
+    Type leftType = exp->left->type;
+    Type rightType = exp->right->type;
+
+    switch (exp->op) {
+        case PLUS_OP:
+        case MINUS_OP:
+        case MUL_OP:
+        case DIV_OP:
+            exp->type = (leftType == INT && rightType == INT) ? INT : UNDEFINED;
+        break;
+
+        case LT_OP:
+        case LE_OP:
+        case GT_OP:
+        case GE_OP:
+        case EQ_OP:
+            exp->type = BOOL;
+        break;
+
+        default:
+            exp->type = UNDEFINED;
+    }
     return 0;
 }
 
 int TypeCheckerVisitor::visit(NumberExp *exp) {
+    exp->type = INT;
     return 0;
 }
 
 int TypeCheckerVisitor::visit(IdExp *exp) {
+    Type type;
+    if (typeEnv.lookup(exp->value, type))
+        exp->type = type;
+    else
+        exp->type = UNDEFINED;
+
     return 0;
 }
 
@@ -448,13 +500,9 @@ int TypeCheckerVisitor::visit(ShortAssignStm *stm) {
 }
 
 int TypeCheckerVisitor::visit(StringExp *exp) {
-    string id;
-    if (stringIds.count(exp->value)) {
-        id = stringIds[exp->value];
-    } else {
-        id = ".L.str_" + to_string(stringCont++);
-        stringIds[exp->value] = id;
-    }
+    exp->type = STRING;
+
+    if (!stringIds.count(exp->value))
+        stringIds[exp->value] = ".L.str_" + to_string(stringCont++);
     return 0;
 }
-
