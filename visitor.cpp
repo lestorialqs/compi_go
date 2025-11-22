@@ -186,6 +186,7 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
 }
 
 int GenCodeVisitor::visit(AssignStm* stm) {
+    // WARNING: Asume que el tipo se mantiene
     stm->e->accept(this);
     if (memoriaGlobal.count(stm->id))
         out << " movq %rax, " << stm->id << "(%rip)"<<endl;
