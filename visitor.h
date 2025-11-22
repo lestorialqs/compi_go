@@ -28,6 +28,7 @@ class DecStm;
 class StringExp;
 
 static Environment<int> env;
+static Environment<Type> typeEnv;
 
 class Visitor {
 public:
@@ -54,7 +55,7 @@ public:
 class TypeCheckerVisitor : public Visitor {
 public:
     unordered_map<string,int> fun_locales;
-    std::unordered_map<string, string> stringIds;
+    unordered_map<string, string> stringIds;
     int stringCont = 0;
     int locales;
     int type(Program* program);
@@ -86,8 +87,7 @@ public:
     int generar(Program* program);
     unordered_map<string, bool> memoriaGlobal;
     unordered_map<string,int> fun_reserva;
-    std::unordered_map<string, string> stringIds;
-    TypeCheckerVisitor type;
+    TypeCheckerVisitor typeChecker;
     int offset = -8;
     int labelcont = 0;
     bool entornoFuncion = false;

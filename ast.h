@@ -24,10 +24,18 @@ enum BinaryOp {
     EQ_OP
 };
 
+enum Type {
+    UNDEFINED,
+    INT,
+    BOOL,
+    STRING,
+};
+
 // Clase abstracta Exp
 class Exp {
 public:
     virtual int  accept(Visitor* visitor) = 0;
+    Type type = UNDEFINED;
     virtual ~Exp() = 0;  // Destructor puro → clase abstracta
     static string binopToChar(BinaryOp op);  // Conversión operador → string
 };
