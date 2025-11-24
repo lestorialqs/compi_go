@@ -20,7 +20,11 @@ public:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     VarDec* parseVarDec();
+=======
+    StructStm* parseStructStm(); // Adding a new rule sounds like an awful idea...
+>>>>>>> Stashed changes
 =======
     StructStm* parseStructStm(); // Adding a new rule sounds like an awful idea...
 >>>>>>> Stashed changes

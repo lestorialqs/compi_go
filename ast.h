@@ -165,9 +165,8 @@ public:
     ~FunDec(){};
 };
 
-<<<<<<< Updated upstream
 class Program{
-=======
+
 class ForStm: public Stm {
 public:
     string var;
@@ -202,19 +201,4 @@ public:
     ~StructStm() {}
     int accept(Visitor* visitor);
 };
-
-class Program {
->>>>>>> Stashed changes
-public:
-    list<VarDec*> vdlist;
-    list<FunDec*> fdlist;
-    list<StructStm*> sdlist;   // List of structure statements.
-
-    Program(){};
-    ~Program(){};
-    int accept(Visitor* visitor);
-};
-
-
-
 #endif // AST_H

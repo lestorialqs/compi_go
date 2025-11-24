@@ -90,6 +90,9 @@ Program* Parser::parseProgram() {
     while (check(Token::FUNC)) {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -107,8 +110,11 @@ Program* Parser::parseProgram() {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 VarDec* Parser::parseVarDec(){
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -316,6 +322,9 @@ Exp* Parser::parseF() {
     else if (match(Token::LPAREN)) {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -337,7 +346,11 @@ Exp* Parser::parseF() {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             while(match(Token::COMA)) {
+=======
+            while (match(Token::COMMA)) {
+>>>>>>> Stashed changes
 =======
             while (match(Token::COMMA)) {
 >>>>>>> Stashed changes

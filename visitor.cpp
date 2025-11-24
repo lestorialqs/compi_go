@@ -91,6 +91,15 @@ int StructStm::accept(Visitor *visitor) {
     return visitor->visit(this);
 }
 
+<<<<<<< Updated upstream
+=======
+// ! = = = New additions = = = !
+
+int StructStm::accept(Visitor *visitor) {
+    return visitor->visit(this);
+}
+
+>>>>>>> Stashed changes
 int FieldAccessExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
@@ -108,8 +117,11 @@ int GenCodeVisitor::visit(Program* program) {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 out << ".data\nprint_fmt: .string \"%ld \\n\""<<endl;
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -166,8 +178,14 @@ int GenCodeVisitor::visit(VarDec* stm) {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             memoria[var] = offset;
             offset -= 8;
+=======
+            // Local: base offset points to first field
+            env.add_var(var, offset);
+            offset -= 8 * wordsPerVar;
+>>>>>>> Stashed changes
 =======
             // Local: base offset points to first field
             env.add_var(var, offset);
@@ -660,6 +678,9 @@ int TypeCheckerVisitor::visit(FieldAccessExp* exp) {
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
