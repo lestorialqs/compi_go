@@ -65,19 +65,22 @@ Program* Parser::parseProgram() {
     match(Token::QUOTE);
     match(Token::SEMICOL);
 
-    if(check(Token::VAR)) {
-        p->vdlist.push_back(parseVarDec());
-        while(check(Token::VAR)) {
+    // top-level var and struct declarations
+    while (check(Token::VAR) || check(Token::STRUCT)) {
+        if (check(Token::VAR)) {
             p->vdlist.push_back(parseVarDec());
+        } else if (check(Token::STRUCT)) {
+            p->sdlist.push_back(parseStructStm());
         }
     }
 
-    while(check(Token::FUNC)) {
+    while (check(Token::FUNC)) {
         p->fdlist.push_back(parseFunDec());
     }
     cout << "Parser exitoso" << endl;
     return p;
 }
+
 
 VarDec* Parser::parseVarDec() {
     VarDec* vd = new VarDec();
@@ -298,30 +301,80 @@ Exp* Parser::parseF() {
         match(Token::QUOTE);
         return e;
     }
-    else if (match(Token::LPAREN))
-    {
+    else if (match(Token::LPAREN)) {
         e = parseCE();
         match(Token::RPAREN);
         return e;
     }
     else if (match(Token::ID)) {
         nom = previous->text;
-        if(check(Token::LPAREN)) {
+
+        // Function call: f(...)
+        if (check(Token::LPAREN)) {
             match(Token::LPAREN);
             FcallExp* fcall = new FcallExp();
             fcall->nombre = nom;
             fcall->argumentos.push_back(parseCE());
-            while(match(Token::COMMA)) {
+            while (match(Token::COMMA)) {
                 fcall->argumentos.push_back(parseCE());
             }
             match(Token::RPAREN);
             return fcall;
         }
         else {
-            return new IdExp(nom);
+            // Variable or chained field access: s.age, s.age.other, ...
+            Exp* base = new IdExp(nom);
+
+            // While there is a ".field", wrap in FieldAccessExp
+            while (match(Token::DOT)) {
+                match(Token::ID);
+                string fieldName = previous->text;
+                base = new FieldAccessExp(base, fieldName);
             }
+
+            return base;
+        }
     }
     else {
         throw runtime_error("Error sintáctico");
     }
 }
+
+// Added changes for handling struct statement declarations
+
+StructStm* Parser::parseStructStm() {
+    StructStm* st = new StructStm();
+
+    match(Token::STRUCT);
+    match(Token::ID);
+    st->name = previous->text;
+
+    match(Token::LBRACE);
+
+    // Parse fields: Type ID [= expr]? ;
+    while (!check(Token::RBRACE) && !isAtEnd()) {
+        // parse type (ID token: "int", "string", "bool", or struct name)
+        match(Token::ID);
+        string typeName = previous->text;
+
+        // field name
+        match(Token::ID);
+        string fieldName = previous->text;
+
+        Exp* init = nullptr;
+        if (match(Token::ASSIGN)) {
+            init = parseCE();  // optional default value
+        }
+
+        match(Token::SEMICOL);
+
+        st->fieldTypes.push_back(typeName);
+        st->fieldNames.push_back(fieldName);
+        st->fieldInits.push_back(init);
+    }
+
+    match(Token::RBRACE);
+    return st;
+}
+
+

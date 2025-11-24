@@ -100,8 +100,13 @@ int GenCodeVisitor::visit(Program* program) {
         dec->accept(this);
     }
 
-    for (auto& [var, _] : memoriaGlobal) {
-        out << var << ": .quad 0"<<endl;
+    for (auto& [var, words] : memoriaGlobal) {
+        if (words <= 1) { // Case of words size
+            out << var << ": .quad 0" << endl;
+        } else {
+            // Reserve words * 8 bytes for the struct instance
+            out << var << ": .zero " << (words * 8) << endl;
+        }
     }
 
     out << ".text\n";
@@ -115,16 +120,26 @@ int GenCodeVisitor::visit(Program* program) {
 }
 
 int GenCodeVisitor::visit(VarDec* stm) {
+    int wordsPerVar = 1;
+
+    auto it = typeChecker.structDefs.find(stm->type);
+    if (it != typeChecker.structDefs.end()) {
+        wordsPerVar = static_cast<int>(it->second.size());
+    }
+
     for (auto var : stm->vars) {
         if (!entornoFuncion) {
-            memoriaGlobal[var] = true;
+            // Global: remember how many 8-byte slots we need
+            memoriaGlobal[var] = wordsPerVar;
         } else {
+            // Local: base offset points to first field
             env.add_var(var, offset);
-            offset -= 8;
+            offset -= 8 * wordsPerVar;
         }
     }
-        return 0;
+    return 0;
 }
+
 
 int GenCodeVisitor::visit(NumberExp* exp) {
     out << " movq $" << exp->value << ", %rax"<<endl;
@@ -356,12 +371,19 @@ int GenCodeVisitor::visit(StringExp *exp) {
 ///////////////////////////////////////////////////////////////////////////////////
 
 int TypeCheckerVisitor::type(Program *program) {
+    // First collect struct definitions
+    for (auto s : program->sdlist) {
+        s->accept(this);
+    }
+
+    // Then type-check functions (bodies use those struct types)
     for(auto i: program->fdlist) {
         i->accept(this);
     }
 
     return 0;
 }
+
 
 int TypeCheckerVisitor::visit(FunDec *fd) {
     int parametros = fd->Pnombres.size();
@@ -373,32 +395,47 @@ int TypeCheckerVisitor::visit(FunDec *fd) {
 
 int TypeCheckerVisitor::visit(Body *body) {
     typeEnv.add_level();
+    typeNameEnv.add_level();  // In case of struct declarations, add level per name of struct.
 
-    for (auto i:body->declarations) {
+    for (auto i : body->declarations) {
         i->accept(this);
     }
 
-    for(auto i:body->StmList) {
+    for (auto i : body->StmList) {
         i->accept(this);
     }
 
+    typeNameEnv.remove_level(); // After execution always lower a level.
     typeEnv.remove_level();
     return 0;
 }
 
+
 int TypeCheckerVisitor::visit(VarDec *vd) {
     Type type = UNDEFINED;
 
-    if (vd->type == "int") type = INT;
-    else if (vd->type == "bool") type = BOOL;
+    if (vd->type == "int")      type = INT;
+    else if (vd->type == "bool")   type = BOOL;
     else if (vd->type == "string") type = STRING;
+    // else: could be a struct type name
 
-    for (auto &v : vd->vars)
-        typeEnv.add_var(v, type);
+    int wordsPerVar = 1;
 
-    locales += vd->vars.size();
+    // If this is a struct type, its size is number of fields
+    auto it = structDefs.find(vd->type);
+    if (it != structDefs.end()) {
+        wordsPerVar = static_cast<int>(it->second.size());
+    }
+
+    for (auto &v : vd->vars) {
+        typeEnv.add_var(v, type);       // basic kind (INT/BOOL/STRING/UNDEFINED)
+        typeNameEnv.add_var(v, vd->type); // full type name, e.g. "student_data"
+        locales += wordsPerVar;
+    }
+
     return 0;
 }
+
 
 int TypeCheckerVisitor::visit(IfStm *stm) {
     int a = locales;
@@ -505,4 +542,113 @@ int TypeCheckerVisitor::visit(StringExp *exp) {
     if (!stringIds.count(exp->value))
         stringIds[exp->value] = ".L.str_" + to_string(stringCont++);
     return 0;
+}
+
+// ADDED CHANGES
+
+int GenCodeVisitor::visit(FieldAccessExp* exp) {
+    IdExp* id = dynamic_cast<IdExp*>(exp->base);
+    if (!id) {
+        // Not supporting nested struct fields as base yet
+        out << " movq $0, %rax" << endl;
+        return 0;
+    }
+
+    string varName = id->value;
+    int idx = exp->fieldIndex;
+    if (idx < 0) idx = 0; // fallback
+
+    if (memoriaGlobal.count(varName)) {
+        // Global struct: var + idx*8(%rip)
+        int bytes = idx * 8;
+        if (bytes == 0)
+            out << " movq " << varName << "(%rip), %rax" << endl;
+        else
+            out << " movq " << varName << "+" << bytes << "(%rip), %rax" << endl;
+    } else if (env.check(varName)) {
+        // Local struct: base offset minus 8*idx
+        int baseOffset = env.lookup(varName);
+        int fieldOffset = baseOffset - idx * 8;
+        out << " movq " << fieldOffset << "(%rbp), %rax" << endl;
+    } else {
+        out << " movq $0, %rax" << endl;
+    }
+
+    return 0;
+}
+
+int GenCodeVisitor::visit(StructStm* stm) {
+    // No runtime code for struct definitions
+    return 0;
+}
+
+
+int TypeCheckerVisitor::visit(StructStm* stm) {
+    vector<FieldInfo> fields;
+
+    for (size_t i = 0; i < stm->fieldNames.size(); ++i) {
+        FieldInfo info;
+        info.name     = stm->fieldNames[i];
+        info.typeName = stm->fieldTypes[i];
+
+        if (info.typeName == "int")      info.type = INT;
+        else if (info.typeName == "bool")   info.type = BOOL;
+        else if (info.typeName == "string") info.type = STRING;
+        else                               info.type = UNDEFINED; // could be nested struct later (Hopefully never because this is a slog.)
+        fields.push_back(info);
+        // NOTE: stm->fieldInits[i] is parsed but not used yet (no default init code yet)
+    }
+
+    structDefs[stm->name] = fields;
+    return 0;
+}
+
+int TypeCheckerVisitor::visit(FieldAccessExp* exp) {
+    // Type-check the base expression
+    exp->base->accept(this);
+
+    // Only support base as a simple variable id (for now)
+    IdExp* id = dynamic_cast<IdExp*>(exp->base);
+    if (!id) {
+        exp->type = UNDEFINED;
+        return 0;
+    }
+
+    string varName = id->value;
+    string typeName;
+
+    // Get declared type name of the variable, e.g. "student_data"
+    if (!typeNameEnv.lookup(varName, typeName)) {
+        exp->type = UNDEFINED;
+        return 0;
+    }
+
+    auto it = structDefs.find(typeName);
+    if (it == structDefs.end()) {
+        exp->type = UNDEFINED;
+        return 0;
+    }
+
+    const auto& fields = it->second;
+    for (size_t i = 0; i < fields.size(); ++i) {
+        if (fields[i].name == exp->field) {
+            exp->fieldIndex = static_cast<int>(i);
+            exp->type = fields[i].type; // INT / BOOL / STRING
+            return 0;
+        }
+    }
+
+    exp->type = UNDEFINED; // unknown field
+    return 0;
+}
+
+
+// Added declarations (Accept statements)
+
+int FieldAccessExp::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int StructStm::accept(Visitor* visitor) {
+    return visitor->visit(this);
 }

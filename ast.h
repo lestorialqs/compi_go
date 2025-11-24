@@ -9,6 +9,9 @@ using namespace std;
 
 class Visitor;
 class VarDec;
+class StructStm; // Forward Declaration.
+class FieldAccessExp; // Forward Declaration.
+
 
 // Operadores binarios soportados
 enum BinaryOp { 
@@ -202,14 +205,43 @@ public:
     ~ForStm(){};
     int accept(Visitor* visitor);
 };
+// ! = = = New addition = = = !
+
+class FieldAccessExp : public Exp {
+public:
+    Exp* base;         // usually an IdExp (e.g., "s")
+    string field;      // e.g., "age"
+    int fieldIndex = -1; // filled by the type checker
+
+    FieldAccessExp(Exp* base, const string& field);
+    ~FieldAccessExp();
+    int accept(Visitor* visitor);
+};
+
+class StructStm : public Stm {
+public:
+    string name;                  // struct name, e.g. "student_data"
+    vector<string> fieldTypes;    // "int", "string", etc.
+    vector<string> fieldNames;    // "age", "name", etc.
+    vector<Exp*>   fieldInits;    // optional default values (may be nullptr)
+
+    StructStm() {}
+    ~StructStm() {}
+    int accept(Visitor* visitor);
+};
+
+// ! = = = End of New Addition = = = !
 
 class Program {
 public:
-    list<VarDec*> vdlist;
-    list<FunDec*> fdlist;
-    Program(){};
-    ~Program(){};
+    list<VarDec*>   vdlist;
+    list<FunDec*>   fdlist;
+    list<StructStm*> sdlist;   // List that contains all struct declarations.
+
+    Program() {}
+    ~Program() {}
     int accept(Visitor* visitor);
 };
+
 
 #endif // AST_H
