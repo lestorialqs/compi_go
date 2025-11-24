@@ -17,7 +17,11 @@ public:
     Program* parseProgram();
     FunDec* parseFunDec();
     Body* parseBody();
+<<<<<<< Updated upstream
     VarDec* parseVarDec();
+=======
+    StructStm* parseStructStm(); // Adding a new rule sounds like an awful idea...
+>>>>>>> Stashed changes
     Stm* parseStm();
     Exp* parseCE();
     Exp* parseBE();

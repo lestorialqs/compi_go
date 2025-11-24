@@ -9,6 +9,9 @@ using namespace std;
 
 class Visitor;
 class VarDec;
+class StructStm;
+class FieldAccessExp;
+
 
 // Operadores binarios soportados
 enum BinaryOp { 
@@ -162,10 +165,51 @@ public:
     ~FunDec(){};
 };
 
+<<<<<<< Updated upstream
 class Program{
+=======
+class ForStm: public Stm {
+public:
+    string var;
+    Stm* initial;
+    Exp* condition;
+    Stm* adder;
+    Body* b;
+    ForStm(){};
+    ~ForStm(){};
+    int accept(Visitor* visitor);
+};
+
+class FieldAccessExp : public Exp {
+public:
+    Exp* base;         // usually an IdExp (e.g., "s")
+    string field;      // e.g., "age"
+    int fieldIndex = -1; // filled by the type checker
+
+    FieldAccessExp(Exp* base, const string& field);
+    ~FieldAccessExp();
+    int accept(Visitor* visitor);
+};
+
+class StructStm : public Stm {
+public:
+    string name;                  // struct name, e.g. "student_data"
+    vector<string> fieldTypes;    // "int", "string", etc.
+    vector<string> fieldNames;    // "age", "name", etc.
+    vector<Exp*>   fieldInits;    // optional default values (may be nullptr)
+
+    StructStm() {}
+    ~StructStm() {}
+    int accept(Visitor* visitor);
+};
+
+class Program {
+>>>>>>> Stashed changes
 public:
     list<VarDec*> vdlist;
     list<FunDec*> fdlist;
+    list<StructStm*> sdlist;   // List of structure statements.
+
     Program(){};
     ~Program(){};
     int accept(Visitor* visitor);

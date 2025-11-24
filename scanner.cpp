@@ -65,11 +65,20 @@ Token* Scanner::nextToken() {
         else if (lexema=="var") return new Token(Token::VAR, input, first, current - first);
         else if (lexema=="true") return new Token(Token::TRUE, input, first, current - first);
         else if (lexema=="false") return new Token(Token::FALSE, input, first, current - first);
+<<<<<<< Updated upstream
 
         else if (lexema=="fun") return new Token(Token::FUN, input, first, current - first);
         else if (lexema=="endfun") return new Token(Token::ENDFUN, input, first, current - first);
         else if (lexema=="return") return new Token(Token::RETURN, input, first, current - first);
 
+=======
+        else if (lexema=="package") return new Token(Token::PACKAGE, input, first, current - first);
+        else if (lexema=="import") return new Token(Token::IMPORT, input, first, current - first);
+        else if (lexema=="const") return new Token(Token::CONST, input, first, current - first);
+        else if (lexema=="for") return new Token(Token::FOR, input, first, current - first);
+        else if (lexema=="struct") return new Token(Token::STRUCT, input, first, current - first); // Struct side
+        else if (lexema=="type") return new Token(Token::TYPE, input, first, current - first);
+>>>>>>> Stashed changes
         else return new Token(Token::ID, input, first, current - first);
     }
     // Operadores

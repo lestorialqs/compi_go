@@ -57,6 +57,7 @@ bool Parser::isAtEnd() {
 
 Program* Parser::parseProgram() {
     Program* p = new Program();
+<<<<<<< Updated upstream
     if(check(Token::VAR)) {
         p->vdlist.push_back(parseVarDec());
         while(match(Token::SEMICOL)) {
@@ -66,6 +67,28 @@ Program* Parser::parseProgram() {
         }
     }
     if(check(Token::FUN)) {
+=======
+    match(Token::PACKAGE);
+    match(Token::ID);
+    match(Token::SEMICOL);
+    match(Token::IMPORT);
+    match(Token::QUOTE);
+    match(Token::FMT);
+    match(Token::QUOTE);
+    match(Token::SEMICOL);
+
+    // top-level var and struct declarations
+    while (check(Token::VAR) || check(Token::STRUCT)) {
+        if (check(Token::VAR)) {
+            p->vdlist.push_back(parseVarDec());
+        } else if (check(Token::STRUCT)) {
+            p->sdlist.push_back(parseStructStm());
+        }
+    }
+
+    // In case of matching keep pushing back elements on the function declaration list
+    while (check(Token::FUNC)) {
+>>>>>>> Stashed changes
         p->fdlist.push_back(parseFunDec());
         while(check(Token::FUN)){
                 p->fdlist.push_back(parseFunDec());
@@ -75,7 +98,12 @@ Program* Parser::parseProgram() {
     return p;
 }
 
+<<<<<<< Updated upstream
 VarDec* Parser::parseVarDec(){
+=======
+
+VarDec* Parser::parseVarDec() {
+>>>>>>> Stashed changes
     VarDec* vd = new VarDec();
     match(Token::VAR);
     match(Token::ID);
@@ -257,30 +285,99 @@ Exp* Parser::parseF() {
     else if (match(Token::FALSE)) {
         return new NumberExp(0);
     }
+<<<<<<< Updated upstream
     else if (match(Token::LPAREN))
     {
+=======
+    else if (match(Token::QUOTE)) {
+        string str = "";
+        match(Token::ID);
+        str.append(previous->text);
+        while (match(Token::ID)) {
+            str.append(" ");
+            str.append(previous->text);
+        }
+        e = new StringExp(str);
+        match(Token::QUOTE);
+        return e;
+    }
+    else if (match(Token::LPAREN)) {
+>>>>>>> Stashed changes
         e = parseCE();
         match(Token::RPAREN);
         return e;
     }
     else if (match(Token::ID)) {
         nom = previous->text;
-        if(check(Token::LPAREN)) {
+
+        // Function call: f(...)
+        if (check(Token::LPAREN)) {
             match(Token::LPAREN);
             FcallExp* fcall = new FcallExp();
             fcall->nombre = nom;
             fcall->argumentos.push_back(parseCE());
+<<<<<<< Updated upstream
             while(match(Token::COMA)) {
+=======
+            while (match(Token::COMMA)) {
+>>>>>>> Stashed changes
                 fcall->argumentos.push_back(parseCE());
             }
             match(Token::RPAREN);
             return fcall;
         }
         else {
-            return new IdExp(nom);
+            // Variable or chained field access: s.age, s.age.other, ...
+            Exp* base = new IdExp(nom);
+
+            // While there is a ".field", wrap in FieldAccessExp
+            while (match(Token::DOT)) {
+                match(Token::ID);
+                string fieldName = previous->text;
+                base = new FieldAccessExp(base, fieldName);
             }
+
+            return base;
+        }
     }
     else {
         throw runtime_error("Error sintáctico");
     }
+}
+
+// New addition!
+
+StructStm* Parser::parseStructStm() {
+    StructStm* st = new StructStm();
+
+    match(Token::STRUCT);
+    match(Token::ID);
+    st->name = previous->text;
+
+    match(Token::LBRACE);
+
+    // Parse fields: Type ID [= expr]? ;
+    while (!check(Token::RBRACE) && !isAtEnd()) {
+        // parse type (ID token: "int", "string", "bool", or struct name)
+        match(Token::ID);
+        string typeName = previous->text;
+
+        // field name
+        match(Token::ID);
+        string fieldName = previous->text;
+
+        Exp* init = nullptr;
+        if (match(Token::ASSIGN)) {
+            init = parseCE();  // optional default value
+        }
+
+        match(Token::SEMICOL);
+
+        st->fieldTypes.push_back(typeName);
+        st->fieldNames.push_back(fieldName);
+        st->fieldInits.push_back(init);
+    }
+
+    match(Token::RBRACE);
+    return st;
 }

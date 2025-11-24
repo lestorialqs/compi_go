@@ -54,6 +54,7 @@ ostream& operator<<(ostream& outs, const Token& tok) {
         case Token::CONST:   outs << "TOKEN(CONST, \""   << tok.text << "\")"; break;
         case Token::FOR:     outs << "TOKEN(FOR, \""     << tok.text << "\")"; break;
         case Token::TRUE:    outs << "TOKEN(TRUE, \""    << tok.text << "\")"; break;
+<<<<<<< Updated upstream
         case Token::FALSE:   outs << "TOKEN(FALSE, \""   << tok.text << "\")"; break;
         case Token::LBRACE:  outs << "TOKEN(LBRACE, \""  << tok.text << "\")"; break;
         case Token::RBRACE:  outs << "TOKEN(RBRACE, \""  << tok.text << "\")"; break;
@@ -68,6 +69,20 @@ ostream& operator<<(ostream& outs, const Token& tok) {
         case Token::ENDFUN:    outs << "TOKEN(ENDFUN, \""    << tok.text << "\")"; break;
         case Token::RETURN:    outs << "TOKEN(RETURN, \""    << tok.text << "\")"; break;
 
+=======
+        case Token::FALSE:    outs << "TOKEN(FALSE, \""    << tok.text << "\")"; break;
+        case Token::PACKAGE:    outs << "TOKEN(PACKAGE, \""    << tok.text << "\")"; break;
+        case Token::IMPORT:    outs << "TOKEN(IMPORT, \""    << tok.text << "\")"; break;
+        case Token::QUOTE:    outs << "TOKEN(QUOTE, \""    << tok.text << "\")"; break;
+        case Token::CONST:    outs << "TOKEN(CONST, \""    << tok.text << "\")"; break;
+        case Token::FOR:    outs << "TOKEN(FOR, \""    << tok.text << "\")"; break;
+        case Token::LBRACE:    outs << "TOKEN(LBRACE, \""    << tok.text << "\")"; break;
+        case Token::RBRACE:    outs << "TOKEN(RBRACE, \""    << tok.text << "\")"; break;
+        case Token::LBRACK:    outs << "TOKEN(LBRACK, \""    << tok.text << "\")"; break;
+        case Token::RBRACK:    outs << "TOKEN(RBRACK, \""    << tok.text << "\")"; break;
+        case Token::STRUCT:    outs << "TOKEN(STRUCT, \""    << tok.text << "\")"; break; // Struct margin
+        case Token::TYPE:    outs << "TOKEN(TYPE, \""    << tok.text << "\")"; break;
+>>>>>>> Stashed changes
         case Token::END:    outs << "TOKEN(END)"; break;
     }
     return outs;

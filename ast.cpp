@@ -41,7 +41,6 @@ IdExp::IdExp(string v) : value(v) {}
 
 IdExp::~IdExp() {}
 
-
 Stm::~Stm(){}
 
 PrintStm::~PrintStm(){}
@@ -67,6 +66,29 @@ AssignStm::AssignStm(string variable,Exp* expresion){
 VarDec::VarDec() {}
 
 VarDec::~VarDec() {}
+
+// Cut Cut Cut Cut Cut Cut
+
+// ---------- FieldAccessExp ----------
+
+FieldAccessExp::FieldAccessExp(Exp* b, const string& f)
+        : base(b), field(f) {}
+
+FieldAccessExp::~FieldAccessExp() {
+    delete base;
+}
+
+int FieldAccessExp::accept(Visitor* visitor) {
+    return 0;
+}
+
+// ---------- StructStm ----------
+
+int StructStm::accept(Visitor* visitor) {
+    return 0;
+}
+
+// Cut Cut Cut Cut Cut Cut
 
 Body::Body(){
     declarations=list<VarDec*>();
