@@ -88,6 +88,9 @@ Program* Parser::parseProgram() {
 
     // In case of matching keep pushing back elements on the function declaration list
     while (check(Token::FUNC)) {
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         p->fdlist.push_back(parseFunDec());
         while(check(Token::FUN)){
@@ -99,8 +102,11 @@ Program* Parser::parseProgram() {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 VarDec* Parser::parseVarDec(){
 =======
+=======
+>>>>>>> Stashed changes
 
 VarDec* Parser::parseVarDec() {
 >>>>>>> Stashed changes
@@ -302,6 +308,9 @@ Exp* Parser::parseF() {
         return e;
     }
     else if (match(Token::LPAREN)) {
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         e = parseCE();
         match(Token::RPAREN);
@@ -317,7 +326,11 @@ Exp* Parser::parseF() {
             fcall->nombre = nom;
             fcall->argumentos.push_back(parseCE());
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             while(match(Token::COMA)) {
+=======
+            while (match(Token::COMMA)) {
+>>>>>>> Stashed changes
 =======
             while (match(Token::COMMA)) {
 >>>>>>> Stashed changes

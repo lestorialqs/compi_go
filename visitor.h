@@ -40,6 +40,9 @@ class FieldAccessExp;
 static Environment<int> env;
 static Environment<Type> typeEnv;
 static Environment<string> typeNameEnv;   // Use this to track declared type names of variables
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 class Visitor {
@@ -119,6 +122,9 @@ public:
     unordered_map<string,int> fun_reserva;
     TypeCheckerVisitor typeChecker;
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     int offset = -8;
     int labelcont = 0;
@@ -148,6 +154,9 @@ public:
 
     int visit(StructStm* stm) override; // I am simply a believer.
     int visit(FieldAccessExp* exp) override; // This is for field access.
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 };
 
