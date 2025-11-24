@@ -41,6 +41,9 @@ static Environment<int> env;
 static Environment<Type> typeEnv;
 static Environment<string> typeNameEnv;   // Use this to track declared type names of variables
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -123,6 +126,9 @@ public:
     TypeCheckerVisitor typeChecker;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -155,6 +161,9 @@ public:
     int visit(StructStm* stm) override; // I am simply a believer.
     int visit(FieldAccessExp* exp) override; // This is for field access.
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
