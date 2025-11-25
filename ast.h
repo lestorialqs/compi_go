@@ -68,6 +68,23 @@ public:
     IdExp(string v);
     ~IdExp();
 };
+class FcallExp: public Exp {
+public:
+    string nombre;
+    vector<Exp*> argumentos;
+    int accept(Visitor* visitor);
+    FcallExp(){};
+    ~FcallExp(){};
+};
+
+class StringExp : public Exp {
+public:
+    string value;
+    int accept(Visitor* visitor);
+    StringExp(string);
+    ~StringExp() {};
+};
+
 
 class Stm {
 public:
@@ -82,6 +99,17 @@ public:
     VarDec();
     int accept(Visitor* visitor);
     ~VarDec();
+};
+
+class ArrayDec{
+    public:
+    string type;
+    Exp* tam;
+    string id;
+
+    ArrayDec();
+    int accept(Visitor* visit);
+    ~ArrayDec();
 };
 
 class Body {
@@ -162,22 +190,6 @@ public:
     int accept(Visitor* visitor);
 };
 
-class FcallExp: public Exp {
-public:
-    string nombre;
-    vector<Exp*> argumentos;
-    int accept(Visitor* visitor);
-    FcallExp(){};
-    ~FcallExp(){};
-};
-
-class StringExp : public Exp {
-public:
-    string value;
-    int accept(Visitor* visitor);
-    StringExp(string);
-    ~StringExp() {};
-};
 
 class FunDec {
 public:

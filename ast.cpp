@@ -91,5 +91,12 @@ StringExp::StringExp(string val) {
     value = val;
 }
 
+ArrayDec::ArrayDec() {
+    // vacío
+}
 
+
+ArrayDec::~ArrayDec() {
+    // vacío
+}
 
