@@ -1,0 +1,12 @@
+// 4.1 Casos para optimización
+package main;
+
+import "fmt";
+
+func main() {
+	var x int;
+	x = (1 + 2 + 3 + 4 + 5 + 6 + 7) * 4;
+	fmt.Println(x)
+}
+
+// Expected output: 112

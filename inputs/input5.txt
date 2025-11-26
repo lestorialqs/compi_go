@@ -1,15 +1,17 @@
-package main
+// 2.2 Casos para la implementación base (Strings)
+package main;
 
-import "fmt"
+import "fmt";
 
 func main() {
 	var a string;
-	a = "hola";
-
 	var b string;
+
+	a = "hola";
 	b = "chau";
 
-	fmt.Println(a + b)
+	fmt.Println(a);
+	fmt.Println(b)
 }
 
-// Expected output: holachau
+// Expected output: hola, chau

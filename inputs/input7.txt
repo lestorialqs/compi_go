@@ -1,16 +1,28 @@
-package main
+// 2.4 Casos para la implementación base (Structs + Strings)
+package main;
 
-import "fmt"
+import "fmt";
+
+type Nota struct {
+	id string;
+	grade int
+}
 
 func main() {
-	var nombres [3]string;
-	nombres[0] = "Diego";
-	nombres[1] = "Pablo";
-	nombres[2] = "Fyodor Dostoevsky";
+	var n Nota;
+	var min int;
+	min = 11;
 
-	for i := 0; i <= 2; i++ {
-		fmt.Println(nombres[i][0:2])
+	n.id = "Andres";
+	n.grade = 10;
+
+    fmt.Println(n.id);
+    fmt.Println("esta");
+	if n.grade < min {
+		fmt.Println("Desaprobado")
+	} else {
+		fmt.Println("Aprobado")
 	}
 }
 
-// Expected output: Di, Pa, Fy
+// Expected output: Aprobado

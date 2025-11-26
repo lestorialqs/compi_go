@@ -1,4 +1,4 @@
-// 2.5 Casos para la implementación base (Arrays + Strings)
+// 3.2 Casos para las extensiones (Arrays Multidimensionales)
 package main;
 
 import "fmt";

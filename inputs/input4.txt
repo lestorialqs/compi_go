@@ -1,17 +1,10 @@
-package main
+// 2.1 Casos para la implementación base (Arrays)
+package main;
 
-import "fmt"
+import "fmt";
 
 func main() {
-	var grades [4]int;
-	grades[0] = 10;
-	grades[1] = 3;
-	grades[2] = 13;
-	grades[3] = 11;
-
-	grades[1] = 5;
-
-	fmt.Println((grades[0] + grades[1] + grades[2] + grades[3]) / 4)
+	(COMPLETAR)
 }
 
-// Expected output: 9
+// Expected output:
