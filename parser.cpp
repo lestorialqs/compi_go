@@ -199,6 +199,10 @@ Stm* Parser::parseStm() {
             return new DecStm(variable);
         } else if (match(Token::DOT)) {
             match(Token::ID);
+            string param = previous->text;
+            match(Token::ASSIGN);
+            e = parseCE();
+            return new FieldAssignStm(variable, param, e);
         }
     }
     else if (match(Token::FMT)) {
@@ -363,7 +367,7 @@ Exp* Parser::parseF() {
             if (match(Token::DOT)) {
                 match(Token::ID);
                 string fieldName = previous->text;
-                return new FieldAccessExp(base, fieldName);
+                return new FieldAccessExp(nom, fieldName);
             }
 
             return base;

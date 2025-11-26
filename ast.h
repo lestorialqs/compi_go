@@ -133,6 +133,16 @@ public:
     int accept(Visitor* visitor);
 };
 
+class FieldAssignStm: public Stm {
+public:
+    string base;
+    string param;
+    Exp* e;
+    FieldAssignStm(string, string, Exp*);
+    ~FieldAssignStm() {};
+    int accept(Visitor* visitor);
+};
+
 class IncStm: public Stm {
 public:
     string id;
@@ -209,10 +219,10 @@ public:
 
 class FieldAccessExp : public Exp {
 public:
-    IdExp* base;         // usually an IdExp (e.g., "s")
+    string base;         // usually an IdExp (e.g., "s")
     string field;      // e.g., "age"
 
-    FieldAccessExp(IdExp* base, const string& field);
+    FieldAccessExp(const string& base, const string& field);
     ~FieldAccessExp();
     int accept(Visitor* visitor);
 };

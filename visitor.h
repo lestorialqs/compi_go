@@ -26,9 +26,9 @@ class ShortAssignStm;
 class IncStm;
 class DecStm;
 class StringExp;
-
 class FieldAccessExp;
 class StructDec;
+class FieldAssignStm;
 
 static Environment<int> env;
 static Environment<Type> typeEnv;
@@ -60,9 +60,9 @@ public:
     virtual int visit(IncStm* stm) = 0;
     virtual int visit(DecStm* stm) = 0;
     virtual int visit(StringExp* exp) = 0;
-
     virtual int visit(FieldAccessExp* exp) = 0;
     virtual int visit(StructDec* stm) = 0;
+    virtual int visit(FieldAssignStm* stm) = 0;
 };
 
 class TypeCheckerVisitor : public Visitor {
@@ -91,9 +91,9 @@ public:
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
-
-    int visit(StructDec* stm) override;       // implement
-    int visit(FieldAccessExp* exp) override;  // implement
+    int visit(StructDec* stm) override;
+    int visit(FieldAccessExp* exp) override;
+    int visit(FieldAssignStm* stm) override;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -127,10 +127,9 @@ public:
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
-
     int visit(StructDec* stm) override;       // (no code)
     int visit(FieldAccessExp* exp) override;  // Field Access handles contact with the variables in a Struct.
-
+    int visit(FieldAssignStm* stm) override;
 };
 
 #endif // VISITOR_H
