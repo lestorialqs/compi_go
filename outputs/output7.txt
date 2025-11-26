@@ -2,11 +2,11 @@
 iniciando parseo
 [PARSER] parseBody - inicio
 [PARSER] Parseando VAR...
-[PARSER] Creado ArrayDec: id=array, dims=2, tipo=int
+[PARSER] Creado ArrayDec: id=numeros, dims=2, tipo=int
 [PARSER] Parseando VAR...
-[PARSER] Creado SimpleVarDec: vars=1, tipo=int
+[PARSER] Creado ArrayDec: id=nombres, dims=2, tipo=string
 [PARSER] Parseando VAR...
-[PARSER] Creado ArrayDec: id=hola, dims=1, tipo=int
+[PARSER] Creado ArrayDec: id=flags, dims=1, tipo=bool
 [PARSER] Total declaraciones parseadas: 3
 [PARSER] parseBody - fin, statements=3
 Parser exitoso
@@ -16,26 +16,28 @@ Parser exitoso
 [TC DEBUG] Num declaraciones: 3
 [TC DEBUG] Num statements: 3
 [TC DEBUG] Procesando declaración...
-[TC DEBUG] ArrayDec: id=array, dimensiones=2
-[TC DEBUG]   - dimensión: 4
-[TC DEBUG]   - dimensión: 4
-[TC DEBUG] ArrayDec: totalSize=16
-[TC DEBUG] ArrayDec: locales incrementado a 16
-[TC DEBUG] Después de declaración, locales=16
+[TC DEBUG] ArrayDec: id=numeros, tipo=int, dimensiones=2
+[TC DEBUG]   - dimensión: 3
+[TC DEBUG]   - dimensión: 3
+[TC DEBUG] ArrayDec: totalSize=9
+[TC DEBUG] ArrayDec: locales incrementado a 9
+[TC DEBUG] Después de declaración, locales=9
 [TC DEBUG] Procesando declaración...
-[TC DEBUG] SimpleVarDec: tipo=int, vars=1
-[TC DEBUG]   - var: x
-[TC DEBUG] SimpleVarDec: locales incrementado a 17
-[TC DEBUG] Después de declaración, locales=17
-[TC DEBUG] Procesando declaración...
-[TC DEBUG] ArrayDec: id=hola, dimensiones=1
-[TC DEBUG]   - dimensión: 4
+[TC DEBUG] ArrayDec: id=nombres, tipo=string, dimensiones=2
+[TC DEBUG]   - dimensión: 2
+[TC DEBUG]   - dimensión: 2
 [TC DEBUG] ArrayDec: totalSize=4
-[TC DEBUG] ArrayDec: locales incrementado a 21
-[TC DEBUG] Después de declaración, locales=21
-[TC DEBUG] Body - fin, locales=21
-[TC DEBUG] Después de Body: locales=21
-[TC DEBUG] fun_locales[main] = 21
+[TC DEBUG] ArrayDec: locales incrementado a 13
+[TC DEBUG] Después de declaración, locales=13
+[TC DEBUG] Procesando declaración...
+[TC DEBUG] ArrayDec: id=flags, tipo=bool, dimensiones=1
+[TC DEBUG]   - dimensión: 2
+[TC DEBUG] ArrayDec: totalSize=2
+[TC DEBUG] ArrayDec: locales incrementado a 15
+[TC DEBUG] Después de declaración, locales=15
+[TC DEBUG] Body - fin, locales=15
+[TC DEBUG] Después de Body: locales=15
+[TC DEBUG] fun_locales[main] = 15
 Código ensamblador generado en: inputs/temp_input7.s
 
 === STDERR ===

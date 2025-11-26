@@ -407,6 +407,11 @@ int GenCodeVisitor::visit(ArrayDec *ad)
         dimensions.push_back(val);
         totalSize *= val;
     }
+        // ✅ NUEVO: Determinar el tipo base del array
+    Type baseType = UNDEFINED;
+    if (ad->type == "int") baseType = INT;
+    else if (ad->type == "bool") baseType = BOOL;
+    else if (ad->type == "string") baseType = STRING;
 
     if (!entornoFuncion) {
         // Arrays globales (por ahora sin implementar completamente)
@@ -417,7 +422,7 @@ int GenCodeVisitor::visit(ArrayDec *ad)
         env.add_var(ad->id, offset);
         
         // Guardar info de dimensiones en el Environment
-        ArrayInfo info = {dimensions, totalSize, offset};
+        ArrayInfo info = {dimensions, totalSize, offset,baseType};
         arrayEnv.add_var(ad->id, info);  // <-- Usar arrayEnv en lugar de map
 
         // Reservar espacio para cada elemento
@@ -452,10 +457,20 @@ int GenCodeVisitor::visit(ArrayLiteralExp* exp) {
             // Es un valor escalar (hoja del árbol).
             // El visit(NumberExp) ya puso el valor en %rax.
             // Ahora nosotros lo guardamos en la posición lineal que toca.
-            
-            out << " movq %rax, " 
-                << (env.lookup(currentArray) - currentArrayIndex * 8) 
-                << "(%rbp)  # Elemento plano [" << currentArrayIndex << "]" << endl;
+            // ✅ NUEVO: Verificar si es string
+            if (e->type == STRING) {
+                // Para strings, %rax ya tiene la DIRECCIÓN del string (leaq)
+                // La guardamos directamente como puntero
+                out << " movq %rax, " 
+                    << (env.lookup(currentArray) - currentArrayIndex * 8) 
+                    << "(%rbp)  # String ptr [" << currentArrayIndex << "]" << endl;
+            }
+            else {
+                // Para int/bool, %rax tiene el VALOR
+                out << " movq %rax, " 
+                    << (env.lookup(currentArray) - currentArrayIndex * 8) 
+                    << "(%rbp)  # Valor [" << currentArrayIndex << "]" << endl;
+            }
             
             // Incrementamos el índice lineal global
             currentArrayIndex++;
@@ -774,19 +789,35 @@ int TypeCheckerVisitor::visit(SimpleVarDec* vd) {
     return 0;
 }
 int TypeCheckerVisitor::visit(ArrayDec* ad) {
-    cout << "[TC DEBUG] ArrayDec: id=" << ad->id << ", dimensiones=" << ad->dimensiones.size() << endl;
-    
+    // 1. Determinar tipo base
+    Type baseType = UNDEFINED;
+    if (ad->type == "int") baseType = INT;
+    else if (ad->type == "bool") baseType = BOOL;
+    else if (ad->type == "string") baseType = STRING;
+
+    cout << "[TC DEBUG] ArrayDec: id=" << ad->id <<", tipo=" << ad->type 
+         << ", dimensiones=" << ad->dimensiones.size() << endl;
+    vector<int> currentDims;
     int totalSize = 1;
     for (Exp* dimExp : ad->dimensiones) {
         int number = dimExp->accept(this);
         cout << "[TC DEBUG]   - dimensión: " << number << endl;
         totalSize *= number;
+        currentDims.push_back(number);
     }
     
     cout << "[TC DEBUG] ArrayDec: totalSize=" << totalSize << endl;
     locales += totalSize;
     cout << "[TC DEBUG] ArrayDec: locales incrementado a " << locales << endl;
-    
+    // 4. GUARDAR EN EL ENTORNO (¡Faltaba esto!)
+    // Esto es vital para que luego sepamos que arr[0] es un STRING
+    ArrayInfo info = {currentDims, totalSize, 0, baseType};
+    arrayEnv.add_var(ad->id, info);
+
+    if (ad->initializer != nullptr) {
+        ad->initializer->accept(this);
+    }
+
     return 0;
 }
 
@@ -795,8 +826,20 @@ int TypeCheckerVisitor::visit(AssignArrayStm *stm)
     return 0;
 }
 
-int TypeCheckerVisitor::visit(ArrayAccessExp *exp)
-{
+int TypeCheckerVisitor::visit(ArrayAccessExp *exp) {
+    // 1. Visitar índices
+    for(auto idx : exp->indices) {
+        idx->accept(this);
+    }
+
+    // 2. RECUPERAR EL TIPO (¡Faltaba esto!)
+    ArrayInfo info;
+    if (arrayEnv.lookup(exp->id, info)) {
+        // Le decimos al nodo: "Tú eres del tipo que diga tu array"
+        exp->type = info.baseType; 
+    } else {
+        exp->type = UNDEFINED;
+    }
     return 0;
 }
 

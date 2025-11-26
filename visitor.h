@@ -32,11 +32,13 @@ class ArrayDec;
 class AssignArrayStm;
 class ArrayAccessExp;
 class ArrayLiteralExp;
+enum Type;
 
 struct ArrayInfo {
     vector<int> dimensions;  // dimensiones del array
     int totalSize;           // producto total
     int baseOffset;          // offset base en stack
+    Type baseType; // <--- AGREGA ESTO: ¿De qué tipo son los elementos?
 };
 static Environment<int> env;
 static Environment<Type> typeEnv;
@@ -73,7 +75,8 @@ public:
 
 class TypeCheckerVisitor : public Visitor {
 public:
-
+    unordered_map<string, Type> funcReturnTypes; // <--- AGREGA ESTO
+    
     unordered_map<string,int> fun_locales;
     unordered_map<string, string> stringIds;
     int stringCont = 0;

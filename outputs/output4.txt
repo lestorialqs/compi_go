@@ -12,7 +12,7 @@ Parser exitoso
 [TC DEBUG] Num declaraciones: 1
 [TC DEBUG] Num statements: 6
 [TC DEBUG] Procesando declaración...
-[TC DEBUG] ArrayDec: id=grades, dimensiones=1
+[TC DEBUG] ArrayDec: id=grades, tipo=int, dimensiones=1
 [TC DEBUG]   - dimensión: 4
 [TC DEBUG] ArrayDec: totalSize=4
 [TC DEBUG] ArrayDec: locales incrementado a 4
