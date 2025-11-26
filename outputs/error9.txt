@@ -1,5 +1,0 @@
-=== ERROR DE PARSEO ===
-Archivo: inputs/temp_input9.txt
-Error: Error sintáctico
-
-Token actual: "}" (tipo: 39)

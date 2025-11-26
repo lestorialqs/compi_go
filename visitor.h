@@ -36,11 +36,13 @@ class ArrayDec;
 class AssignArrayStm;
 class ArrayAccessExp;
 class ArrayLiteralExp;
+enum Type;
 
 struct ArrayInfo {
     vector<int> dimensions;  // dimensiones del array
     int totalSize;           // producto total
     int baseOffset;          // offset base en stack
+    Type baseType;
 };
 static Environment<int> env;
 static Environment<Type> typeEnv;
@@ -88,6 +90,7 @@ public:
     unordered_map<string, int> fun_locales;
     unordered_map<string, string> stringIds;
     unordered_map<string, vector<FieldInfo>> structDefs; // Handles struct definitions based on names.
+    unordered_map<string, Type> funcReturnTypes;
     int stringCont = 0;
     int locales;
     int type(Program* program);

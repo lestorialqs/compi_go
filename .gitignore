@@ -39,4 +39,4 @@ compile_commands.json
 Thumbs.db
 
 # Output files
-./outputs
+outputs/
