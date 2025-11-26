@@ -3,14 +3,17 @@ package main;
 
 import "fmt";
 
-func add(x int) int {
-    return x+1
+func calc(a int, b int) int {
+    var x int;
+    x = a * b;
+    x = x;
+    return x
 }
 
 func main() {
-	var y int;
-	y = add(10);
-    fmt.Println(y)
+	var result int;
+	result = calc(10, 20);
+    fmt.Println(result)
 }
 
-// Expected output: 11
+// Expected output: 200

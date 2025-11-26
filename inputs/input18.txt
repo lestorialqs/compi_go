@@ -3,14 +3,18 @@ package main;
 
 import "fmt";
 
-func res(y string) string {
-    return "Hola que tal"
+func res(input int) int {
+    var temp, b, final int;
+    temp = input + 10;
+    b = 5 * 2 + 3 - 2;
+    final = temp - b;
+    return final
 }
 
 func main() {
-	var a, b string;
-	a = res(b);
-    fmt.Println(a)
+	var result int;
+	result = res(50);
+    fmt.Println(result)
 }
 
-// Expected output: Hola que tal
+// Expected output: 49
