@@ -37,3 +37,6 @@ compile_commands.json
 # Operating System Files
 .DS_Store
 Thumbs.db
+
+# Output files
+outputs/

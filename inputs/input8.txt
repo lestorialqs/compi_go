@@ -1,10 +1,9 @@
 // 2.5 Casos para la implementación base (Arrays + Strings)
 package main;
 
-import "fmt";
+import "fmt"
 
 func main() {
-	(COMPLETAR)
+	var array[3][3] int = [3][3] int {{1,2,3},{4,5,6},{7,8,9}};
+    
 }
-
-// Expected output:
