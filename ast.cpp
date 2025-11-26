@@ -93,22 +93,9 @@ StringExp::StringExp(string val) {
 
 // ---------- FieldAccessExp ----------
 
-FieldAccessExp::FieldAccessExp(Exp* b, const string& f)
+FieldAccessExp::FieldAccessExp(IdExp* b, const string& f)
         : base(b), field(f) {}
 
 FieldAccessExp::~FieldAccessExp() {
     delete base;
 }
-
-int FieldAccessExp::accept(Visitor* visitor) {
-    return visitor->visit(this);
-}
-
-// ---------- StructStm ----------
-
-int StructStm::accept(Visitor* visitor) {
-    return visitor->visit(this);
-}
-
-
-

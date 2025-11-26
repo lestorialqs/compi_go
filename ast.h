@@ -9,7 +9,7 @@ using namespace std;
 
 class Visitor;
 class VarDec;
-class StructStm; // Forward Declaration.
+class StructDec; // Forward Declaration.
 class FieldAccessExp; // Forward Declaration.
 
 
@@ -209,24 +209,22 @@ public:
 
 class FieldAccessExp : public Exp {
 public:
-    Exp* base;         // usually an IdExp (e.g., "s")
+    IdExp* base;         // usually an IdExp (e.g., "s")
     string field;      // e.g., "age"
-    int fieldIndex = -1; // filled by the type checker
 
-    FieldAccessExp(Exp* base, const string& field);
+    FieldAccessExp(IdExp* base, const string& field);
     ~FieldAccessExp();
     int accept(Visitor* visitor);
 };
 
-class StructStm : public Stm {
+class StructDec : public Stm {
 public:
     string name;                  // struct name, e.g. "student_data"
     vector<string> fieldTypes;    // "int", "string", etc.
     vector<string> fieldNames;    // "age", "name", etc.
-    vector<Exp*>   fieldInits;    // optional default values (may be nullptr)
 
-    StructStm() {}
-    ~StructStm() {}
+    StructDec() {}
+    ~StructDec() {}
     int accept(Visitor* visitor);
 };
 
@@ -236,7 +234,7 @@ class Program {
 public:
     list<VarDec*>   vdlist;
     list<FunDec*>   fdlist;
-    list<StructStm*> sdlist;   // List that contains all struct declarations.
+    list<StructDec*> sdlist;   // List that contains all struct declarations.
 
     Program() {}
     ~Program() {}

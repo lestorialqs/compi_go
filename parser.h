@@ -15,10 +15,10 @@ private:
 public:
     Parser(Scanner* scanner);       
     Program* parseProgram();
+    StructDec* parseStructDec(); // I don't know how much of a good idea adding another production rule is...
     VarDec* parseVarDec();
     FunDec* parseFunDec();
     Body* parseBody();
-    StructStm* parseStructStm(); // I don't know how much of a good idea adding another production rule is...
     Stm* parseStm();
     Exp* parseCE();
     Exp* parseBE();

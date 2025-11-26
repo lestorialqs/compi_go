@@ -9,13 +9,6 @@
 #include "environment.h"
 using namespace std;
 
-struct FieldInfo {
-    string name;      // field name
-    string typeName;  // "int", "bool", "string", or struct name
-    Type   type;      // basic kind (INT, BOOL, STRING, UNDEFINED)
-};
-
-
 class BinaryExp;
 class NumberExp;
 class Program;
@@ -35,13 +28,17 @@ class DecStm;
 class StringExp;
 
 class FieldAccessExp;
-class StructStm;
-
+class StructDec;
 
 static Environment<int> env;
 static Environment<Type> typeEnv;
-static Environment<string> typeNameEnv;   // Use this Environment to keep track of type names of variables.
+static Environment<string> structTypeEnv;
 
+struct FieldInfo {
+    string name;      // field name
+    Type   type;      // basic kind (INT, BOOL, STRING, UNDEFINED)
+    int paramOffset;  // param offset (From base address)
+};
 
 class Visitor {
 public:
@@ -65,14 +62,12 @@ public:
     virtual int visit(StringExp* exp) = 0;
 
     virtual int visit(FieldAccessExp* exp) = 0;
-    virtual int visit(StructStm* stm) = 0;
-
-
+    virtual int visit(StructDec* stm) = 0;
 };
 
 class TypeCheckerVisitor : public Visitor {
 public:
-    unordered_map<string,int> fun_locales;
+    unordered_map<string, int> fun_locales;
     unordered_map<string, string> stringIds;
     unordered_map<string, vector<FieldInfo>> structDefs; // Handles struct definitions based on names.
     int stringCont = 0;
@@ -97,9 +92,8 @@ public:
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
 
-    int visit(StructStm* stm) override;       // implement
+    int visit(StructDec* stm) override;       // implement
     int visit(FieldAccessExp* exp) override;  // implement
-
 };
 
 class GenCodeVisitor : public Visitor {
@@ -134,7 +128,7 @@ public:
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
 
-    int visit(StructStm* stm) override;       // (no code)
+    int visit(StructDec* stm) override;       // (no code)
     int visit(FieldAccessExp* exp) override;  // Field Access handles contact with the variables in a Struct.
 
 };
