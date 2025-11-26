@@ -26,9 +26,19 @@ class ShortAssignStm;
 class IncStm;
 class DecStm;
 class StringExp;
+class FieldAccessExp;
+class StructDec;
+class FieldAssignStm;
 
 static Environment<int> env;
 static Environment<Type> typeEnv;
+static Environment<string> structTypeEnv;
+
+struct FieldInfo {
+    string name;      // field name
+    Type   type;      // basic kind (INT, BOOL, STRING, UNDEFINED)
+    int paramOffset;  // param offset (From base address)
+};
 
 class Visitor {
 public:
@@ -50,12 +60,16 @@ public:
     virtual int visit(IncStm* stm) = 0;
     virtual int visit(DecStm* stm) = 0;
     virtual int visit(StringExp* exp) = 0;
+    virtual int visit(FieldAccessExp* exp) = 0;
+    virtual int visit(StructDec* stm) = 0;
+    virtual int visit(FieldAssignStm* stm) = 0;
 };
 
 class TypeCheckerVisitor : public Visitor {
 public:
-    unordered_map<string,int> fun_locales;
+    unordered_map<string, int> fun_locales;
     unordered_map<string, string> stringIds;
+    unordered_map<string, vector<FieldInfo>> structDefs; // Handles struct definitions based on names.
     int stringCont = 0;
     int locales;
     int type(Program* program);
@@ -77,6 +91,9 @@ public:
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
+    int visit(StructDec* stm) override;
+    int visit(FieldAccessExp* exp) override;
+    int visit(FieldAssignStm* stm) override;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -85,7 +102,7 @@ private:
 public:
     GenCodeVisitor(std::ostream& out) : out(out) {}
     int generar(Program* program);
-    unordered_map<string, bool> memoriaGlobal;
+    unordered_map<string, int> memoriaGlobal;  // was <string, bool>, it's int now to keep numbers
     unordered_map<string,int> fun_reserva;
     TypeCheckerVisitor typeChecker;
     int offset = -8;
@@ -110,6 +127,9 @@ public:
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
+    int visit(StructDec* stm) override;       // (no code)
+    int visit(FieldAccessExp* exp) override;  // Field Access handles contact with the variables in a Struct.
+    int visit(FieldAssignStm* stm) override;
 };
 
 #endif // VISITOR_H

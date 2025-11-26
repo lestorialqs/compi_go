@@ -65,6 +65,13 @@ Program* Parser::parseProgram() {
     match(Token::QUOTE);
     match(Token::SEMICOL);
 
+    if(check(Token::TYPE)) {
+        p->sdlist.push_back(parseStructDec());
+        while(check(Token::TYPE)) {
+            p->sdlist.push_back(parseStructDec());
+        }
+    }
+
     if(check(Token::VAR)) {
         p->vdlist.push_back(parseVarDec());
         while(check(Token::VAR)) {
@@ -72,11 +79,42 @@ Program* Parser::parseProgram() {
         }
     }
 
-    while(check(Token::FUNC)) {
+    while (check(Token::FUNC)) {
         p->fdlist.push_back(parseFunDec());
     }
     cout << "Parser exitoso" << endl;
     return p;
+}
+
+StructDec* Parser::parseStructDec() {
+    StructDec* st = new StructDec();
+
+    match(Token::TYPE);
+    match(Token::ID);
+    st->name = previous->text;
+    match(Token::STRUCT);
+
+    match(Token::LBRACE);
+
+    // Parse fields: Type ID [= expr]? ;
+    match(Token::ID);
+    string fieldName = previous->text;
+    match(Token::ID);
+    string typeName = previous->text;
+    st->fieldTypes.push_back(typeName);
+    st->fieldNames.push_back(fieldName);
+
+    while(match(Token::SEMICOL)) {
+        match(Token::ID);
+        fieldName = previous->text;
+        match(Token::ID);
+        typeName = previous->text;
+        st->fieldTypes.push_back(typeName);
+        st->fieldNames.push_back(fieldName);
+    }
+
+    match(Token::RBRACE);
+    return st;
 }
 
 VarDec* Parser::parseVarDec() {
@@ -159,6 +197,12 @@ Stm* Parser::parseStm() {
             return new IncStm(variable);
         } else if (match(Token::DEC)) {
             return new DecStm(variable);
+        } else if (match(Token::DOT)) {
+            match(Token::ID);
+            string param = previous->text;
+            match(Token::ASSIGN);
+            e = parseCE();
+            return new FieldAssignStm(variable, param, e);
         }
     }
     else if (match(Token::FMT)) {
@@ -298,28 +342,36 @@ Exp* Parser::parseF() {
         match(Token::QUOTE);
         return e;
     }
-    else if (match(Token::LPAREN))
-    {
+    else if (match(Token::LPAREN)) {
         e = parseCE();
         match(Token::RPAREN);
         return e;
     }
     else if (match(Token::ID)) {
         nom = previous->text;
-        if(check(Token::LPAREN)) {
+
+        // Function call: f(...)
+        if (check(Token::LPAREN)) {
             match(Token::LPAREN);
             FcallExp* fcall = new FcallExp();
             fcall->nombre = nom;
             fcall->argumentos.push_back(parseCE());
-            while(match(Token::COMMA)) {
+            while (match(Token::COMMA)) {
                 fcall->argumentos.push_back(parseCE());
             }
             match(Token::RPAREN);
             return fcall;
-        }
-        else {
-            return new IdExp(nom);
+        } else {
+            IdExp* base = new IdExp(nom);
+
+            if (match(Token::DOT)) {
+                match(Token::ID);
+                string fieldName = previous->text;
+                return new FieldAccessExp(nom, fieldName);
             }
+
+            return base;
+        }
     }
     else {
         throw runtime_error("Error sintáctico");
