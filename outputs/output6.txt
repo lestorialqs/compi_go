@@ -1,0 +1,15 @@
+=== STDOUT ===
+iniciando parseo
+Parser exitoso
+Código ensamblador generado en: inputs/temp_input6.s
+
+=== STDERR ===
+=== INICIANDO ===
+=== FASE 1: ESCANEANDO TOKENS ===
+Tokens guardados en: inputs/temp_input6_tokens.txt
+=== FASE 2: PARSEANDO ===
+Parser exitoso
+=== FASE 3: GENERANDO CÓDIGO ===
+=== PROCESO EXITOSO ===
+
+=== RETURN CODE: 0 ===

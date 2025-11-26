@@ -1,0 +1,16 @@
+=== STDOUT ===
+iniciando parseo
+[PARSER] parseBody - inicio
+[PARSER] Parseando VAR...
+[PARSER] Creado SimpleVarDec: vars=1, tipo=string
+[PARSER] Total declaraciones parseadas: 1
+Error de parseo guardado en: inputs/temp_input5_error.txt
+
+=== STDERR ===
+=== INICIANDO ===
+=== FASE 1: ESCANEANDO TOKENS ===
+Tokens guardados en: inputs/temp_input5_tokens.txt
+=== FASE 2: PARSEANDO ===
+Error en parser: Error sintáctico
+
+=== RETURN CODE: 1 ===

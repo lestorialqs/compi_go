@@ -82,9 +82,9 @@ DecStm::DecStm(string var) {
     id = var;
 }
 
-VarDec::VarDec() {}
+//VarDec::VarDec() {}
 
-VarDec::~VarDec() {}
+//VarDec::~VarDec() {}
 
 Body::Body(){
     declarations=list<VarDec*>();

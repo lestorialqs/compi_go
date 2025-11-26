@@ -1,0 +1,5 @@
+=== ERROR DE PARSEO ===
+Archivo: inputs/temp_input7.txt
+Error: Error sintáctico
+
+Token actual: "var" (tipo: 29)

@@ -1,0 +1,5 @@
+=== ERROR DE PARSEO ===
+Archivo: inputs/temp_input8.txt
+Error: Error sintáctico
+
+Token actual: "}" (tipo: 39)

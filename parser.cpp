@@ -55,6 +55,7 @@ bool Parser::isAtEnd() {
 // =============================
 
 Program* Parser::parseProgram() {
+    cout<<"iniciando parseo"<<endl;
     Program* p = new Program();
     match(Token::PACKAGE);
     match(Token::ID);
@@ -118,18 +119,125 @@ StructDec* Parser::parseStructDec() {
 }
 
 VarDec* Parser::parseVarDec() {
-    VarDec* vd = new VarDec();
     match(Token::VAR);
+
+    // Primer identificador obligatorio
     match(Token::ID);
-    vd->vars.push_back(previous->text);
-    while(match(Token::COMMA)) {
+    string id = previous->text;
+
+    // -------------------------------------------------------
+    //         ¿VIENEN DIMENSIONES?  →  ES ARRAY
+    // -------------------------------------------------------
+    vector<Exp*> dims;
+
+    while (match(Token::LBRACK)) {
+        Exp* dim = parseCE();  // CExp
+        dims.push_back(dim);
+        match(Token::RBRACK);
+    }
+
+    // Si dims NO está vacío → ArrayDec
+    if (!dims.empty()) {
+        // Ahora debe venir el tipo
+        match(Token::ID);
+        string type = previous->text;
+
+        // --------------------------------------
+        // ¿Hay inicializador? (= ArrayLiteral)
+        // --------------------------------------
+        ArrayLiteralExp* init = nullptr;
+
+        if (match(Token::ASSIGN)) {
+            init = parseArrayLiteral();  // <-- función nueva
+        }
+
+        match(Token::SEMICOL);
+
+        // Construimos el nodo
+        ArrayDec* arr = new ArrayDec();
+        arr->id = id;
+        arr->type = type;
+        arr->dimensiones = dims;
+        arr->initializer = init;
+                cout << "[PARSER] Creado ArrayDec: id=" << id 
+             << ", dims=" << dims.size() 
+             << ", tipo=" << type << endl;
+
+        return arr;
+    }
+
+    // -------------------------------------------------------
+    //     CASO CONTRARIO ES SimpleVarDec (NO ARRAY)
+    // -------------------------------------------------------
+    SimpleVarDec* vd = new SimpleVarDec();
+    vd->vars.push_back(id);
+
+    while (match(Token::COMMA)) {
         match(Token::ID);
         vd->vars.push_back(previous->text);
     }
+
     match(Token::ID);
     vd->type = previous->text;
-    // match(Token::SEMICOL);  <-- REMOVED SEMICOL FOR TESTING
+
+    match(Token::SEMICOL);
+
+    cout << "[PARSER] Creado SimpleVarDec: vars=" << vd->vars.size() 
+         << ", tipo=" << vd->type << endl;
     return vd;
+}
+
+
+// Función auxiliar para parsear solo los elementos {...}
+ArrayLiteralExp* Parser::parseArrayElements() {
+    match(Token::LBRACE);  // {
+    
+    ArrayLiteralExp* literal = new ArrayLiteralExp();
+    
+    // Caso vacío: {}
+    if (check(Token::RBRACE)) {
+        match(Token::RBRACE);
+        return literal;
+    }
+
+    // Parsear elementos
+    do {
+        if (check(Token::LBRACE)) {
+            // Sub-array recursivo
+            literal->elements.push_back(parseArrayElements());
+        }
+        else {
+            // Elemento simple
+            literal->elements.push_back(parseCE());
+        }
+    }
+    while (match(Token::COMMA));
+
+    match(Token::RBRACE);  // }
+    return literal;
+}
+// Función principal para el literal completo
+ArrayLiteralExp* Parser::parseArrayLiteral() {
+    // 1. Parsear dimensiones: [3][3]
+    vector<Exp*> dims;
+    while (match(Token::LBRACK)) {
+        Exp* dim = parseCE();
+        dims.push_back(dim);
+        match(Token::RBRACK);
+    }
+
+    // 2. Parsear tipo base
+    match(Token::ID);
+    string type = previous->text;
+
+    // 3. Parsear elementos
+    ArrayLiteralExp* literal = parseArrayElements();
+    
+    // 4. Asignar dims y type
+    literal->dims = dims;
+    literal->type = type;
+
+    return literal;
 }
 
 FunDec *Parser::parseFunDec() {
@@ -163,19 +271,27 @@ FunDec *Parser::parseFunDec() {
 
 Body* Parser::parseBody(){
     Body* b = new Body();
+    
+    cout << "[PARSER] parseBody - inicio" << endl;
 
-    if(check(Token::VAR)) {
+    while(check(Token::VAR)) {
+        cout << "[PARSER] Parseando VAR..." << endl;
         b->declarations.push_back(parseVarDec());
+    }
+
+    cout << "[PARSER] Total declaraciones parseadas: " << b->declarations.size() << endl;
+
+    if (!check(Token::RBRACE)) {
+        b->StmList.push_back(parseStm());
+        
         while(match(Token::SEMICOL)) {
-            if(check(Token::VAR)) {
-                b->declarations.push_back(parseVarDec());
+            if (!check(Token::RBRACE)) {
+                b->StmList.push_back(parseStm());
             }
         }
     }
-    b->StmList.push_back(parseStm());
-    while(match(Token::SEMICOL)) {
-        b->StmList.push_back(parseStm());
-    }
+    
+    cout << "[PARSER] parseBody - fin, statements=" << b->StmList.size() << endl;
     return b;
 }
 
@@ -187,6 +303,24 @@ Stm* Parser::parseStm() {
     Body* fb = nullptr;
     if(match(Token::ID)){
         variable = previous->text;
+
+        // ---  acceso array --- //
+        if (check(Token::LBRACK)) {
+            vector<Exp*> idx = parseArrayIndices();
+
+            if (match(Token::ASSIGN)) {
+                Exp* val = parseCE();
+                // construir nodo manualmente
+                AssignArrayStm* stm = new AssignArrayStm();
+                stm->id = variable;
+                stm->indices = idx;
+                stm->value = val;
+                return stm;  // <-- FALTABA ESTO
+            }
+
+        }
+
+
         if (match(Token::ASSIGN)) {
             e = parseCE();
             return new AssignStm(variable,e);
@@ -249,7 +383,15 @@ Stm* Parser::parseStm() {
     }
     return a;
 }
-
+vector<Exp*> Parser::parseArrayIndices() {
+    vector<Exp*> idx;
+    do {
+        match(Token::LBRACK);
+        idx.push_back(parseCE());   // parsea expresión del índice
+        match(Token::RBRACK);
+    } while (check(Token::LBRACK));
+    return idx;
+}
 Exp* Parser::parseCE() {
     Exp* l = parseBE();
 
@@ -359,17 +501,30 @@ Exp* Parser::parseF() {
     else if (match(Token::ID)) {
         nom = previous->text;
 
-        // Function call: f(...)
-        if (check(Token::LPAREN)) {
+        if(check(Token::LPAREN)) {
             match(Token::LPAREN);
             FcallExp* fcall = new FcallExp();
             fcall->nombre = nom;
+
+
             fcall->argumentos.push_back(parseCE());
             while (match(Token::COMMA)) {
                 fcall->argumentos.push_back(parseCE());
             }
             match(Token::RPAREN);
             return fcall;
+        }
+        // --- acceso a arreglo: id[exp][exp]... --- //
+        if (check(Token::LBRACK)) {
+            vector<Exp*> idx = parseArrayIndices();
+
+            ArrayAccessExp* arr = new ArrayAccessExp();
+            arr->id = nom;
+            arr->indices = idx;
+            return arr;
+        }
+        else {
+            return new IdExp(nom);
         } else {
             IdExp* base = new IdExp(nom);
 
@@ -382,6 +537,7 @@ Exp* Parser::parseF() {
             return base;
         }
     }
+    
     else {
         throw runtime_error("Error sintáctico");
     }
