@@ -90,6 +90,10 @@ int FieldAssignStm::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
+int TernaryExp::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 int GenCodeVisitor::generar(Program* program) {
@@ -446,6 +450,18 @@ int GenCodeVisitor::visit(FieldAssignStm *stm) {
     return 0;
 }
 
+int GenCodeVisitor::visit(TernaryExp *exp) {
+    int label = labelcont++;
+    exp->condition->accept(this);
+    out << " cmpq $0, %rax"<<endl;
+    out << " je else_" << label << endl;
+    exp->trueExp->accept(this);
+    out << " jmp endt_" << label << endl;
+    out << " else_" << label << ":"<< endl;
+    exp->falseExp->accept(this);
+    out << "endt_" << label << ":"<< endl;
+    return 0;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -666,5 +682,11 @@ int TypeCheckerVisitor::visit(FieldAccessExp* exp) {
 
 int TypeCheckerVisitor::visit(FieldAssignStm *stm) {
     stm->e->accept(this);
+    return 0;
+}
+
+int TypeCheckerVisitor::visit(TernaryExp *exp) {
+    exp->trueExp->accept(this);
+    exp->falseExp->accept(this);
     return 0;
 }

@@ -54,6 +54,7 @@ public:
         RBRACK,  // ]
         STRUCT,  // struct
         TYPE,    // type
+        QUESTION,// ?
         END,     // Fin de entrada
     };
 

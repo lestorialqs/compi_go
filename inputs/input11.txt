@@ -1,10 +1,15 @@
-// 3.3 Casos para las extensiones (Retorno de estructuras)
+// 3.3 Casos para las extensiones (Ternarias)
 package main;
 
 import "fmt";
 
 func main() {
-	(COMPLETAR)
+    var x, y, max int;
+    x = 5;
+    y = 10;
+
+    max = (x > y) ? x : y;
+    fmt.Println(max)
 }
 
-// Expected output:
+// Expected output: 10
