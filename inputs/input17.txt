@@ -1,0 +1,19 @@
+// 4.4 Casos para optimización
+package main;
+
+import "fmt";
+
+func op(x int, y int) int {
+    return (x * y) + 2 + 40
+}
+
+func main() {
+	var x, y int;
+	x = 5;
+	y = 1;
+
+	y = op(x, y);
+    fmt.Println(y)
+}
+
+// Expected output: 47

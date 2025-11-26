@@ -1,0 +1,19 @@
+// 3.5 Casos para las extensiones (Ternarias)
+package main;
+
+import "fmt";
+
+func min(a int, b int) int {
+    var min int;
+    return (a > b) ? b : a
+}
+
+func main() {
+    var x, y, max int;
+    x = 5;
+    y = 10;
+
+    fmt.Println(min(x, y))
+}
+
+// Expected output: 5

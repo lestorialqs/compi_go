@@ -20,6 +20,7 @@ public:
 
     Parser(Scanner* scanner);       
     Program* parseProgram();
+    StructDec* parseStructDec(); // I don't know how much of a good idea adding another production rule is...
     VarDec* parseVarDec();
     ArrayLiteralExp* parseArrayLiteral();
     FunDec* parseFunDec();

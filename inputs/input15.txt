@@ -1,0 +1,16 @@
+// 4.2 Casos para optimización
+package main;
+
+import "fmt";
+
+func add(x int) int {
+    return x+1
+}
+
+func main() {
+	var y int;
+	y = add(10);
+    fmt.Println(y)
+}
+
+// Expected output: 11

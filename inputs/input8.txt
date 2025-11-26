@@ -1,4 +1,5 @@
-package main
+// 2.5 Casos para la implementación base (Arrays + Strings)
+package main;
 
 import "fmt"
 

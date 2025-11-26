@@ -9,6 +9,9 @@ using namespace std;
 
 class Visitor;
 class VarDec;
+class StructDec; // Forward Declaration.
+class FieldAccessExp; // Forward Declaration.
+
 
 // Operadores binarios soportados
 enum BinaryOp { 
@@ -204,6 +207,16 @@ public:
     int accept(Visitor* visitor);
 };
 
+class FieldAssignStm: public Stm {
+public:
+    string base;
+    string param;
+    Exp* e;
+    FieldAssignStm(string, string, Exp*);
+    ~FieldAssignStm() {};
+    int accept(Visitor* visitor);
+};
+
 class IncStm: public Stm {
 public:
     string id;
@@ -260,14 +273,51 @@ public:
     ~ForStm(){};
     int accept(Visitor* visitor);
 };
+// ! = = = New addition = = = !
+
+class FieldAccessExp : public Exp {
+public:
+    string base;         // usually an IdExp (e.g., "s")
+    string field;      // e.g., "age"
+
+    FieldAccessExp(const string& base, const string& field);
+    ~FieldAccessExp();
+    int accept(Visitor* visitor);
+};
+
+class StructDec : public Stm {
+public:
+    string name;                  // struct name, e.g. "student_data"
+    vector<string> fieldTypes;    // "int", "string", etc.
+    vector<string> fieldNames;    // "age", "name", etc.
+
+    StructDec() {}
+    ~StructDec() {}
+    int accept(Visitor* visitor);
+};
+
+class TernaryExp: public Exp {
+public:
+    Exp* condition;
+    Exp* trueExp;
+    Exp* falseExp;
+    TernaryExp() {};
+    ~TernaryExp() {};
+    int accept(Visitor* visitor);
+};
+
+// ! = = = End of New Addition = = = !
 
 class Program {
 public:
-    list<VarDec*> vdlist;
-    list<FunDec*> fdlist;
-    Program(){};
-    ~Program(){};
+    list<VarDec*>   vdlist;
+    list<FunDec*>   fdlist;
+    list<StructDec*> sdlist;   // List that contains all struct declarations.
+
+    Program() {}
+    ~Program() {}
     int accept(Visitor* visitor);
 };
+
 
 #endif // AST_H
