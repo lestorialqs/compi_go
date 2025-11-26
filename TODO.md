@@ -3,7 +3,7 @@
 
 ## Extensiones
 - [ ] Arreglos Multidimensionales
-- [ ] Retorno de estructuras o arreglos
+- [ ] Expresiones condicionales (ternarias)
 
 ## Test Cases:
 - [x] 3 casos de funciones.

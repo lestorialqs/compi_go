@@ -68,6 +68,12 @@ ShortAssignStm::ShortAssignStm(string variable,Exp* expresion){
     e = expresion;
 }
 
+FieldAssignStm::FieldAssignStm(string b, string p,Exp* expresion){
+    base = b;
+    param = p;
+    e = expresion;
+}
+
 IncStm::IncStm(string var) {
     id = var;
 }
@@ -89,4 +95,13 @@ Body::~Body(){}
 
 StringExp::StringExp(string val) {
     value = val;
+}
+
+// ---------- FieldAccessExp ----------
+
+FieldAccessExp::FieldAccessExp(const string& b, const string& f)
+        : base(b), field(f) {}
+
+FieldAccessExp::~FieldAccessExp() {
+
 }

@@ -1,0 +1,15 @@
+// 3.4 Casos para las extensiones (Ternarias)
+package main;
+
+import "fmt";
+
+func main() {
+	var x int;
+	var out string;
+	x = 5;
+
+	out = (x > 3) ? "Verdadero" : "Falso";
+	fmt.Println(out)
+}
+
+// Expected output: Verdadero

@@ -1,0 +1,14 @@
+// 4.3 Casos para optimización
+package main;
+
+import "fmt";
+
+func main() {
+	var a, b, c int;
+	a = 20;
+	b = a + 10 + 200;
+	c = b;
+	fmt.Println(c)
+}
+
+// Expected output: 230

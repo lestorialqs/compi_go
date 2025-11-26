@@ -1,0 +1,16 @@
+// 4.5 Casos para optimización
+package main;
+
+import "fmt";
+
+func res(y string) string {
+    return "Hola que tal"
+}
+
+func main() {
+	var a, b string;
+	a = res(b);
+    fmt.Println(a)
+}
+
+// Expected output: Hola que tal
