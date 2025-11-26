@@ -25,4 +25,4 @@ func main() {
 	}
 }
 
-// Expected output: Aprobado
+// Expected output: Desaprobado

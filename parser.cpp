@@ -522,9 +522,6 @@ Exp* Parser::parseF() {
             arr->id = nom;
             arr->indices = idx;
             return arr;
-        }
-        else {
-            return new IdExp(nom);
         } else {
             IdExp* base = new IdExp(nom);
 

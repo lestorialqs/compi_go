@@ -88,7 +88,9 @@ int ArrayAccessExp::accept(Visitor* visit) {
      return visit->visit(this);
 }
 int ArrayLiteralExp::accept(Visitor* visit) {
-     return visit->visit(this);
+    return visit->visit(this);
+}
+
 int FieldAccessExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
@@ -143,29 +145,29 @@ int GenCodeVisitor::visit(Program* program) {
         return 0;
 }
 
-int GenCodeVisitor::visit(VarDec* stm) {
-    int wordsPerVar = 1;
-
-    auto it = typeChecker.structDefs.find(stm->type);
-    if (it != typeChecker.structDefs.end()) {
-        wordsPerVar = static_cast<int>(it->second.size());
-    }
-
-    for (auto var : stm->vars) {
-        if (!entornoFuncion) {
-            // Global: remember how many 8-byte slots we need
-            memoriaGlobal[var] = wordsPerVar;
-        } else {
-            // Local: base offset points to first field
-            env.add_var(var, offset);
-            if (typeChecker.structDefs.count(stm->type)) {
-                structTypeEnv.add_var(var, stm->type);
-            }
-            offset -= 8 * wordsPerVar;
-        }
-    }
-    return 0;
-}
+// int GenCodeVisitor::visit(VarDec* stm) {
+//     int wordsPerVar = 1;
+//
+//     auto it = typeChecker.structDefs.find(stm->type);
+//     if (it != typeChecker.structDefs.end()) {
+//         wordsPerVar = static_cast<int>(it->second.size());
+//     }
+//
+//     for (auto var : stm->vars) {
+//         if (!entornoFuncion) {
+//             // Global: remember how many 8-byte slots we need
+//             memoriaGlobal[var] = wordsPerVar;
+//         } else {
+//             // Local: base offset points to first field
+//             env.add_var(var, offset);
+//             if (typeChecker.structDefs.count(stm->type)) {
+//                 structTypeEnv.add_var(var, stm->type);
+//             }
+//             offset -= 8 * wordsPerVar;
+//         }
+//     }
+//     return 0;
+// }
 
 
 int GenCodeVisitor::visit(NumberExp* exp) {
@@ -404,21 +406,30 @@ int GenCodeVisitor::visit(StringExp *exp) {
     return 0;
 }
 
-int GenCodeVisitor::visit(SimpleVarDec *vd)
-{
-    for (auto &var : vd->vars)
-    {
+int GenCodeVisitor::visit(SimpleVarDec *vd) {
+    int wordsPerVar = 1;
+
+    auto it = typeChecker.structDefs.find(vd->type);
+    if (it != typeChecker.structDefs.end()) {
+        wordsPerVar = static_cast<int>(it->second.size());
+    }
+
+    for (auto var : vd->vars) {
         if (!entornoFuncion) {
-            // variables globales
-            memoriaGlobal[var] = true;
+            // Global: remember how many 8-byte slots we need
+            memoriaGlobal[var] = wordsPerVar;
         } else {
-            // variables locales
+            // Local: base offset points to first field
             env.add_var(var, offset);
-            offset -= 8;   // cada variable ocupa 8 bytes
+            if (typeChecker.structDefs.count(vd->type)) {
+                structTypeEnv.add_var(var, vd->type);
+            }
+            offset -= 8 * wordsPerVar;
         }
     }
     return 0;
 }
+
 int GenCodeVisitor::visit(ArrayDec *ad)
 {
     // Evaluar cada dimensión (debe ser NumberExp)
@@ -641,6 +652,7 @@ int GenCodeVisitor::visit(ArrayAccessExp *exp)
 
     return 0;
 }
+
 int GenCodeVisitor::visit(FieldAccessExp* exp) {
     string varName = exp->base;
 
@@ -774,32 +786,32 @@ int TypeCheckerVisitor::visit(Body *body) {
 }
 
 
-int TypeCheckerVisitor::visit(VarDec *vd) {
-    Type type = UNDEFINED;
-
-    if (vd->type == "int") type = INT;
-    else if (vd->type == "bool") type = BOOL;
-    else if (vd->type == "string") type = STRING;
-    // else: could be a struct type name
-
-    int wordsPerVar = 1;
-
-    // If this is a struct type, its size is number of fields
-    auto it = structDefs.find(vd->type);
-    if (it != structDefs.end()) {
-        wordsPerVar = static_cast<int>(it->second.size());
-    }
-
-    for (auto &v : vd->vars) {
-        typeEnv.add_var(v, type);       // basic kind (INT/BOOL/STRING/UNDEFINED)
-        if (structDefs.count(vd->type)) {
-            structTypeEnv.add_var(v, vd->type);
-        }
-        locales += wordsPerVar;
-    }
-
-    return 0;
-}
+// int TypeCheckerVisitor::visit(VarDec *vd) {
+//     Type type = UNDEFINED;
+//
+//     if (vd->type == "int") type = INT;
+//     else if (vd->type == "bool") type = BOOL;
+//     else if (vd->type == "string") type = STRING;
+//     // else: could be a struct type name
+//
+//     int wordsPerVar = 1;
+//
+//     // If this is a struct type, its size is number of fields
+//     auto it = structDefs.find(vd->type);
+//     if (it != structDefs.end()) {
+//         wordsPerVar = static_cast<int>(it->second.size());
+//     }
+//
+//     for (auto &v : vd->vars) {
+//         typeEnv.add_var(v, type);       // basic kind (INT/BOOL/STRING/UNDEFINED)
+//         if (structDefs.count(vd->type)) {
+//             structTypeEnv.add_var(v, vd->type);
+//         }
+//         locales += wordsPerVar;
+//     }
+//
+//     return 0;
+// }
 
 
 int TypeCheckerVisitor::visit(IfStm *stm) {
@@ -908,24 +920,38 @@ int TypeCheckerVisitor::visit(StringExp *exp) {
         stringIds[exp->value] = ".L.str_" + to_string(stringCont++);
     return 0;
 }
+
 int TypeCheckerVisitor::visit(SimpleVarDec* vd) {
     Type type = UNDEFINED;
 
     if (vd->type == "int") type = INT;
     else if (vd->type == "bool") type = BOOL;
     else if (vd->type == "string") type = STRING;
+    // else: could be a struct type name
 
     cout << "[TC DEBUG] SimpleVarDec: tipo=" << vd->type << ", vars=" << vd->vars.size() << endl;
-    
-    for (auto &v : vd->vars) {
-        cout << "[TC DEBUG]   - var: " << v << endl;
-        typeEnv.add_var(v, type);
+
+    int wordsPerVar = 1;
+
+    // If this is a struct type, its size is number of fields
+    auto it = structDefs.find(vd->type);
+    if (it != structDefs.end()) {
+        wordsPerVar = static_cast<int>(it->second.size());
     }
 
-    locales += vd->vars.size();
+    for (auto &v : vd->vars) {
+        cout << "[TC DEBUG]   - var: " << v << endl;
+        typeEnv.add_var(v, type);       // basic kind (INT/BOOL/STRING/UNDEFINED)
+        if (structDefs.count(vd->type)) {
+            structTypeEnv.add_var(v, vd->type);
+        }
+        locales += wordsPerVar;
+    }
+
     cout << "[TC DEBUG] SimpleVarDec: locales incrementado a " << locales << endl;
     return 0;
 }
+
 int TypeCheckerVisitor::visit(ArrayDec* ad) {
     cout << "[TC DEBUG] ArrayDec: id=" << ad->id << ", dimensiones=" << ad->dimensiones.size() << endl;
     
@@ -953,12 +979,12 @@ int TypeCheckerVisitor::visit(ArrayAccessExp *exp)
     return 0;
 }
 
-int TypeCheckerVisitor::visit(ArrayLiteralExp *exp) 
-{
+int TypeCheckerVisitor::visit(ArrayLiteralExp *exp) {
     exp->type = ARRAY;
     for (Exp* e : exp->elements) {
         e->accept(this);  // esto rellena e->type
     }
+}
 
 int TypeCheckerVisitor::visit(StructDec* stm) {
     vector<FieldInfo> fields;
