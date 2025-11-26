@@ -29,6 +29,7 @@ class StringExp;
 class FieldAccessExp;
 class StructDec;
 class FieldAssignStm;
+class TernaryExp;
 
 static Environment<int> env;
 static Environment<Type> typeEnv;
@@ -63,6 +64,7 @@ public:
     virtual int visit(FieldAccessExp* exp) = 0;
     virtual int visit(StructDec* stm) = 0;
     virtual int visit(FieldAssignStm* stm) = 0;
+    virtual int visit(TernaryExp* exp) = 0;
 };
 
 class TypeCheckerVisitor : public Visitor {
@@ -94,6 +96,7 @@ public:
     int visit(StructDec* stm) override;
     int visit(FieldAccessExp* exp) override;
     int visit(FieldAssignStm* stm) override;
+    int visit(TernaryExp* exp) override;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -130,6 +133,7 @@ public:
     int visit(StructDec* stm) override;       // (no code)
     int visit(FieldAccessExp* exp) override;  // Field Access handles contact with the variables in a Struct.
     int visit(FieldAssignStm* stm) override;
+    int visit(TernaryExp* exp) override;
 };
 
 #endif // VISITOR_H

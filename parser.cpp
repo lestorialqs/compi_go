@@ -345,6 +345,15 @@ Exp* Parser::parseF() {
     else if (match(Token::LPAREN)) {
         e = parseCE();
         match(Token::RPAREN);
+
+        if (match(Token::QUESTION)) {
+            TernaryExp* tep = new TernaryExp();
+            tep->condition = e;
+            tep->trueExp = parseCE();
+            match(Token::COLON);
+            tep->falseExp = parseCE();
+            return tep;
+        }
         return e;
     }
     else if (match(Token::ID)) {

@@ -238,6 +238,16 @@ public:
     int accept(Visitor* visitor);
 };
 
+class TernaryExp: public Exp {
+public:
+    Exp* condition;
+    Exp* trueExp;
+    Exp* falseExp;
+    TernaryExp() {};
+    ~TernaryExp() {};
+    int accept(Visitor* visitor);
+};
+
 // ! = = = End of New Addition = = = !
 
 class Program {

@@ -1,10 +1,15 @@
-// 3.4 Casos para las extensiones (Retorno de estructuras)
+// 3.4 Casos para las extensiones (Ternarias)
 package main;
 
 import "fmt";
 
 func main() {
-	(COMPLETAR)
+	var x int;
+	var out string;
+	x = 5;
+
+	out = (x > 3) ? "Verdadero" : "Falso";
+	fmt.Println(out)
 }
 
-// Expected output:
+// Expected output: Verdadero
