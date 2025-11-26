@@ -30,7 +30,6 @@ class FieldAccessExp;
 class StructDec;
 class FieldAssignStm;
 class TernaryExp;
-
 class SimpleVarDec;
 class ArrayDec;
 class AssignArrayStm;
@@ -122,6 +121,38 @@ public:
     int visit(TernaryExp* exp) override;
 };
 
+class CodeOptimizerVisitor : public Visitor {
+private:
+    Exp* constFold(Exp* e);
+public:
+    int optimizar(Program* program);
+    int visit(BinaryExp* exp) override;
+    int visit(NumberExp* exp) override;
+    int visit(IdExp* exp) override;
+    int visit(Program* p) override ;
+    int visit(PrintStm* stm) override;
+    int visit(AssignStm* stm) override;
+    int visit(ForWhileStm* stm) override;
+    int visit(IfStm* stm) override;
+    int visit(Body* body) override;
+    int visit(FcallExp* fcall) override;
+    int visit(ReturnStm* r) override;
+    int visit(FunDec* fd) override;
+    int visit(ForStm* fs) override;
+    int visit(ShortAssignStm* stm) override;
+    int visit(IncStm* stm) override;
+    int visit(DecStm* stm) override;
+    int visit(StringExp* exp) override;
+    int visit(SimpleVarDec* vd) override;
+    int visit(ArrayDec* vd) override;
+    int visit(AssignArrayStm* stm) override;
+    int visit(ArrayAccessExp* exp) override;
+    int visit(ArrayLiteralExp* exp) override;
+    int visit(StructDec* stm) override;
+    int visit(FieldAccessExp* exp) override;
+    int visit(FieldAssignStm* stm) override;
+    int visit(TernaryExp* exp) override;
+};
 
 class GenCodeVisitor : public Visitor {
 private:
@@ -132,6 +163,7 @@ public:
     unordered_map<string, int> memoriaGlobal;  // was <string, bool>, it's int now to keep numbers
     unordered_map<string,int> fun_reserva;
     TypeCheckerVisitor typeChecker;
+    CodeOptimizerVisitor optimizer;
     int offset = -8;
     int labelcont = 0;
     bool entornoFuncion = false;

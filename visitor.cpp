@@ -114,6 +114,7 @@ int GenCodeVisitor::generar(Program* program) {
     arrayEnv.add_level();
     structTypeEnv.add_level();
     typeChecker.type(program);
+    optimizer.optimizar(program);
     fun_reserva = typeChecker.fun_locales;
     program->accept(this);
         return 0;
@@ -271,7 +272,7 @@ int GenCodeVisitor::visit(Body* b) {
     }
     arrayEnv.remove_level(); 
     env.remove_level();
-    structTypeEnv.add_level();
+    structTypeEnv.remove_level();
     return 0;
 }
 
@@ -1079,5 +1080,178 @@ int TypeCheckerVisitor::visit(FieldAssignStm *stm) {
 int TypeCheckerVisitor::visit(TernaryExp *exp) {
     exp->trueExp->accept(this);
     exp->falseExp->accept(this);
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+Exp *CodeOptimizerVisitor::constFold(Exp *e) {
+    BinaryExp* bin = dynamic_cast<BinaryExp*>(e);
+    if (!bin) return e;
+
+    bin->left = constFold(bin->left);
+    bin->right = constFold(bin->right);
+
+    NumberExp* leftRes = dynamic_cast<NumberExp*>(bin->left);
+    NumberExp* rightRes = dynamic_cast<NumberExp*>(bin->right);
+    if (!leftRes || !rightRes) return e;
+
+    int lv = leftRes->value;
+    int rv = rightRes->value;
+    int res;
+
+    switch (bin->op) {
+        case PLUS_OP:  res = lv + rv; break;
+        case MINUS_OP: res = lv - rv; break;
+        case MUL_OP:   res = lv * rv; break;
+        case LT_OP:    res = lv < rv; break;
+        case LE_OP:    res = lv <= rv; break;
+        case GT_OP:    res = lv > rv; break;
+        case GE_OP:    res = lv >= rv; break;
+        case EQ_OP:    res = (lv == rv); break;
+        default:
+            return e;
+    }
+
+    NumberExp* newNode = new NumberExp(res);
+    newNode->type = bin->type;
+    return newNode;
+}
+
+int CodeOptimizerVisitor::optimizar(Program *program) {
+    for (auto fd : program->fdlist) {
+        fd->accept(this);
+    }
+
+    for (auto vd : program->vdlist) {
+        vd->accept(this);
+    }
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(BinaryExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(NumberExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(IdExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(Program *p) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(PrintStm *stm) {
+    stm->e = constFold(stm->e);
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(AssignStm *stm) {
+    stm->e = constFold(stm->e);
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ForWhileStm *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(IfStm *stm) {
+    stm->condition = constFold(stm->condition);
+    stm->then->accept(this);
+    if (stm->els) stm->els->accept(this);
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(Body *body) {
+    for (auto dec : body->declarations) {
+        dec->accept(this);
+    }
+
+    for (auto stm : body->StmList) {
+        stm->accept(this);
+    }
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(FcallExp *fcall) {
+    for (auto arg : fcall->argumentos) {
+        arg->accept(this);
+    }
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ReturnStm *r) {
+    r->e = constFold(r->e);
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(FunDec *fd) {
+    if (fd->cuerpo) {
+        fd->cuerpo->accept(this);
+    }
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ForStm *fs) {
+    fs->initial->accept(this);
+    fs->condition = constFold(fs->condition);
+    fs->adder->accept(this);
+    fs->b->accept(this);
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ShortAssignStm *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(IncStm *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(DecStm *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(StringExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(SimpleVarDec *vd) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ArrayDec *vd) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(AssignArrayStm *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ArrayAccessExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(ArrayLiteralExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(StructDec *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(FieldAccessExp *exp) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(FieldAssignStm *stm) {
+    return 0;
+}
+
+int CodeOptimizerVisitor::visit(TernaryExp *exp) {
     return 0;
 }
