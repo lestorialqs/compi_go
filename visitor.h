@@ -27,8 +27,20 @@ class IncStm;
 class DecStm;
 class StringExp;
 
+class SimpleVarDec;
+class ArrayDec;
+class AssignArrayStm;
+class ArrayAccessExp;
+class ArrayLiteralExp;
+
+struct ArrayInfo {
+    vector<int> dimensions;  // dimensiones del array
+    int totalSize;           // producto total
+    int baseOffset;          // offset base en stack
+};
 static Environment<int> env;
 static Environment<Type> typeEnv;
+static Environment<ArrayInfo> arrayEnv;
 
 class Visitor {
 public:
@@ -41,7 +53,6 @@ public:
     virtual int visit(IfStm* stm) = 0;
     virtual int visit(AssignStm* stm) = 0;
     virtual int visit(Body* body) = 0;
-    virtual int visit(VarDec* vd) = 0;
     virtual int visit(FcallExp* fcall) = 0;
     virtual int visit(ReturnStm* r) = 0;
     virtual int visit(FunDec* fd) = 0;
@@ -50,10 +61,19 @@ public:
     virtual int visit(IncStm* stm) = 0;
     virtual int visit(DecStm* stm) = 0;
     virtual int visit(StringExp* exp) = 0;
+
+
+    virtual int visit(SimpleVarDec* vd) = 0;
+    virtual int visit(ArrayDec* vd) = 0;
+    virtual int visit(AssignArrayStm* stm) = 0;
+    virtual int visit(ArrayAccessExp* exp) = 0;
+    virtual int visit(ArrayLiteralExp* exp) = 0;
+        
 };
 
 class TypeCheckerVisitor : public Visitor {
 public:
+
     unordered_map<string,int> fun_locales;
     unordered_map<string, string> stringIds;
     int stringCont = 0;
@@ -68,7 +88,6 @@ public:
     int visit(ForWhileStm* stm) override;
     int visit(IfStm* stm) override;
     int visit(Body* body) override;
-    int visit(VarDec* vd) override;
     int visit(FcallExp* fcall) override;
     int visit(ReturnStm* r) override;
     int visit(FunDec* fd) override;
@@ -77,14 +96,22 @@ public:
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
+
+
+    int visit(SimpleVarDec* vd) override;
+    int visit(ArrayDec* vd) override;
+    int visit(AssignArrayStm* stm) override;
+    int visit(ArrayAccessExp* exp) override;
+    int visit(ArrayLiteralExp* exp) override;
 };
+
 
 class GenCodeVisitor : public Visitor {
 private:
     std::ostream& out;
 public:
     GenCodeVisitor(std::ostream& out) : out(out) {}
-    int generar(Program* program);
+    int generar(Program* program);  
     unordered_map<string, bool> memoriaGlobal;
     unordered_map<string,int> fun_reserva;
     TypeCheckerVisitor typeChecker;
@@ -92,6 +119,9 @@ public:
     int labelcont = 0;
     bool entornoFuncion = false;
     string nombreFuncion;
+
+    string currentArray; // nombre del array inicializando
+    int currentArrayIndex;
     int visit(BinaryExp* exp) override;
     int visit(NumberExp* exp) override;
     int visit(IdExp* exp) override;
@@ -101,7 +131,6 @@ public:
     int visit(ForWhileStm* stm) override;
     int visit(IfStm* stm) override;
     int visit(Body* body) override;
-    int visit(VarDec* vd) override;
     int visit(FcallExp* fcall) override;
     int visit(ReturnStm* r) override;
     int visit(FunDec* fd) override;
@@ -110,6 +139,12 @@ public:
     int visit(IncStm* stm) override;
     int visit(DecStm* stm) override;
     int visit(StringExp* exp) override;
+
+    int visit(SimpleVarDec* vd) override;
+    int visit(ArrayDec* vd) override;
+    int visit(AssignArrayStm* stm) override;
+    int visit(ArrayAccessExp* exp) override;
+    int visit(ArrayLiteralExp* exp) override;
 };
 
 #endif // VISITOR_H

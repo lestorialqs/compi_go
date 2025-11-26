@@ -76,9 +76,9 @@ DecStm::DecStm(string var) {
     id = var;
 }
 
-VarDec::VarDec() {}
+//VarDec::VarDec() {}
 
-VarDec::~VarDec() {}
+//VarDec::~VarDec() {}
 
 Body::Body(){
     declarations=list<VarDec*>();
@@ -90,13 +90,3 @@ Body::~Body(){}
 StringExp::StringExp(string val) {
     value = val;
 }
-
-ArrayDec::ArrayDec() {
-    // vacío
-}
-
-
-ArrayDec::~ArrayDec() {
-    // vacío
-}
-

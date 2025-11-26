@@ -1,0 +1,45 @@
+=== STDOUT ===
+iniciando parseo
+[PARSER] Creado SimpleVarDec: vars=1, tipo=int
+[PARSER] parseBody - inicio
+[PARSER] Parseando VAR...
+[PARSER] Creado SimpleVarDec: vars=1, tipo=int
+[PARSER] Total declaraciones parseadas: 1
+[PARSER] parseBody - fin, statements=2
+[PARSER] parseBody - inicio
+[PARSER] Total declaraciones parseadas: 0
+[PARSER] parseBody - fin, statements=1
+Parser exitoso
+[TC DEBUG] FunDec: suma parametros=2
+[TC DEBUG] Procesando cuerpo de suma
+[TC DEBUG] Body - inicio, locales=0
+[TC DEBUG] Num declaraciones: 1
+[TC DEBUG] Num statements: 2
+[TC DEBUG] Procesando declaración...
+[TC DEBUG] SimpleVarDec: tipo=int, vars=1
+[TC DEBUG]   - var: y
+[TC DEBUG] SimpleVarDec: locales incrementado a 1
+[TC DEBUG] Después de declaración, locales=1
+[TC DEBUG] Body - fin, locales=1
+[TC DEBUG] Después de Body: locales=1
+[TC DEBUG] fun_locales[suma] = 3
+[TC DEBUG] FunDec: main parametros=0
+[TC DEBUG] Procesando cuerpo de main
+[TC DEBUG] Body - inicio, locales=0
+[TC DEBUG] Num declaraciones: 0
+[TC DEBUG] Num statements: 1
+[TC DEBUG] Body - fin, locales=0
+[TC DEBUG] Después de Body: locales=0
+[TC DEBUG] fun_locales[main] = 0
+Código ensamblador generado en: inputs/temp_input1.s
+
+=== STDERR ===
+=== INICIANDO ===
+=== FASE 1: ESCANEANDO TOKENS ===
+Tokens guardados en: inputs/temp_input1_tokens.txt
+=== FASE 2: PARSEANDO ===
+Parser exitoso
+=== FASE 3: GENERANDO CÓDIGO ===
+=== PROCESO EXITOSO ===
+
+=== RETURN CODE: 0 ===

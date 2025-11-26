@@ -12,18 +12,31 @@ private:
     bool check(Token::Type ttype);   // Comprueba si el token actual es de cierto tipo, sin avanzar
     bool advance();                  // Avanza al siguiente token
     bool isAtEnd();                  // Comprueba si ya se llegó al final de la entrada
+
+    ArrayLiteralExp* parseArrayElements(); // funcion auxiliar para parsear Literales
 public:
+
+
+
     Parser(Scanner* scanner);       
     Program* parseProgram();
     VarDec* parseVarDec();
+    ArrayLiteralExp* parseArrayLiteral();
     FunDec* parseFunDec();
     Body* parseBody();
     Stm* parseStm();
+    vector<Exp*> parseArrayIndices();
     Exp* parseCE();
     Exp* parseBE();
     Exp* parseE();
     Exp* parseT();
     Exp* parseF();
+
+
+
+    // Hacer current y previous públicos para debug
+    Token* getCurrentToken() const { return current; } // DEBUG
+    Token* getPreviousToken() const { return previous; } // DEBUG
 };
 
 #endif // PARSER_H      

@@ -29,6 +29,7 @@ enum Type {
     INT,
     BOOL,
     STRING,
+    ARRAY // agregado 
 };
 
 // Clase abstracta Exp
@@ -85,31 +86,64 @@ public:
     ~StringExp() {};
 };
 
+class ArrayAccessExp : public Exp {
+public:
+    string id;
+    vector<Exp*> indices;   // <--- antes tenías solo Exp* index
 
+    int accept(Visitor* v) override;
+    ArrayAccessExp(){};
+    ~ArrayAccessExp() {};
+};
+
+
+class ArrayLiteralExp : public Exp {
+public:
+    std::vector<Exp*> elements; // cada elemento puede ser NumberExp, StringExp o otro ArrayLiteralExp
+    vector<Exp*> dims;
+    string type;
+    ArrayLiteralExp() {}
+    int accept(Visitor* v) override;
+    ~ArrayLiteralExp() {}
+};
 class Stm {
 public:
     virtual int accept(Visitor* visitor) = 0;
     virtual ~Stm() = 0;
 };
 
+
 class VarDec {
 public:
-    string type;
-    list<string> vars;
-    VarDec();
-    int accept(Visitor* visitor);
-    ~VarDec();
+    virtual ~VarDec() {}
+    virtual int accept(Visitor* v) = 0;
 };
 
-class ArrayDec{
-    public:
+class SimpleVarDec : public VarDec {
+public:
+    vector<string> vars;
     string type;
-    Exp* tam;
-    string id;
 
-    ArrayDec();
-    int accept(Visitor* visit);
-    ~ArrayDec();
+    SimpleVarDec(){};
+    int accept(Visitor* v) override;
+    ~SimpleVarDec(){};
+};
+// --- ArrayDec ahora soporta N dimensiones y opcional initializer ---
+
+class ArrayDec : public VarDec {
+public:
+    std::string id;                 // nombre: nombres, matriz, etc
+    std::string type;               // tipo base: int, string, bool...
+    std::vector<Exp*> dimensiones;  // lista de dimensiones: [3][2][5]
+    ArrayLiteralExp* initializer;   // puede ser null
+
+    ArrayDec() : initializer(nullptr) {}
+    int accept(Visitor* visit) override;
+    
+    ~ArrayDec() {
+        for (auto d : dimensiones) delete d;
+        delete initializer;
+    }
 };
 
 class Body {
@@ -147,6 +181,18 @@ public:
     AssignStm(string, Exp*);
     ~AssignStm();
     int accept(Visitor* visitor);
+};
+
+class AssignArrayStm : public Stm {
+public:
+    string id;          // nombre del array
+    vector<Exp*> indices; // lista de índices [i][j][k]
+    Exp* value;              // expresión a asignar
+
+    AssignArrayStm() {}
+    ~AssignArrayStm() {}
+    
+    int accept(Visitor* visitor) override;
 };
 
 class ShortAssignStm: public Stm {
