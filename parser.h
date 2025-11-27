@@ -33,8 +33,6 @@ public:
     Exp* parseT();
     Exp* parseF();
 
-
-
     // Hacer current y previous públicos para debug
     Token* getCurrentToken() const { return current; } // DEBUG
     Token* getPreviousToken() const { return previous; } // DEBUG

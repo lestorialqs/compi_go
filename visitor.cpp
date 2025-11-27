@@ -146,31 +146,6 @@ int GenCodeVisitor::visit(Program* program) {
         return 0;
 }
 
-// int GenCodeVisitor::visit(VarDec* stm) {
-//     int wordsPerVar = 1;
-//
-//     auto it = typeChecker.structDefs.find(stm->type);
-//     if (it != typeChecker.structDefs.end()) {
-//         wordsPerVar = static_cast<int>(it->second.size());
-//     }
-//
-//     for (auto var : stm->vars) {
-//         if (!entornoFuncion) {
-//             // Global: remember how many 8-byte slots we need
-//             memoriaGlobal[var] = wordsPerVar;
-//         } else {
-//             // Local: base offset points to first field
-//             env.add_var(var, offset);
-//             if (typeChecker.structDefs.count(stm->type)) {
-//                 structTypeEnv.add_var(var, stm->type);
-//             }
-//             offset -= 8 * wordsPerVar;
-//         }
-//     }
-//     return 0;
-// }
-
-
 int GenCodeVisitor::visit(NumberExp* exp) {
     out << " movq $" << exp->value << ", %rax"<<endl;
     return 0;
@@ -439,18 +414,9 @@ int GenCodeVisitor::visit(ArrayDec *ad)
     TypeCheckerVisitor evaluator;
 
     for (Exp* dimExp : ad->dimensiones) {
-// 2. POLIMORFISMO PURO (El truco maestro):
-        // En lugar de castear "dimExp" a "NumberExp", le decimos:
-        // "Oye nodo, deja que 'evaluator' te visite".
-        // Como dimExp es en realidad un NumberExp, el C++ llamará automáticamente
-        // a evaluator.visit(NumberExp*), el cual retorna el valor entero.
-        
         int val = dimExp->accept(&evaluator);
         
-        // Validación básica
         if (val <= 0) {
-            // Si por error metieron un StringExp, el TypeChecker probablemente
-            // retornó 0 u otro valor. Aquí lo atrapamos.
             cerr << "Error: Dimensión inválida (debe ser > 0)" << endl;
             return 0;
         }
@@ -459,29 +425,21 @@ int GenCodeVisitor::visit(ArrayDec *ad)
         totalSize *= val;
     }
 
-    // ✅ NUEVO: Determinar el tipo base del array
     Type baseType = UNDEFINED;
     if (ad->type == "int") baseType = INT;
     else if (ad->type == "bool") baseType = BOOL;
     else if (ad->type == "string") baseType = STRING;
 
     if (!entornoFuncion) {
-        // Arrays globales (por ahora sin implementar completamente)
         memoriaGlobal[ad->id] = true;
-        // Podrías también guardar en arrayEnv aquí si lo necesitas
     } else {
-        // Arrays locales
         env.add_var(ad->id, offset);
         
-        // Guardar info de dimensiones en el Environment
         ArrayInfo info = {dimensions, totalSize, offset,baseType};
-        arrayEnv.add_var(ad->id, info);  // <-- Usar arrayEnv en lugar de map
-
-        // Reservar espacio para cada elemento
+        arrayEnv.add_var(ad->id, info);
         offset -= totalSize * 8;
     }
 
-    // SI HAY inicializador, procesarlo
     if (ad->initializer != nullptr) {
         currentArray = ad->id;
         currentArrayIndex = 0;
@@ -493,52 +451,23 @@ int GenCodeVisitor::visit(ArrayDec *ad)
 
 
 int GenCodeVisitor::visit(ArrayLiteralExp* exp) {
-    // Recorremos los elementos genéricos (Exp*)
     for (Exp* e : exp->elements) {
-        
-        // PASO 1: Polimorfismo puro.
-        // - Si 'e' es un sub-array: Se ejecutará visit(ArrayLiteralExp) recursivamente.
-        // - Si 'e' es un número: Se ejecutará visit(NumberExp) y pondrá el valor en %rax.
         e->accept(this);
-
-        // PASO 2: Decidir si guardamos en memoria.
-        // Aquí usamos tu enum 'type' (INT, BOOL, ARRAY...) que definiste en el AST.
-        // No necesitamos castear el objeto, solo saber qué es.
-        
         if (e->type != ARRAY) {
-            // Es un valor escalar (hoja del árbol).
-            // El visit(NumberExp) ya puso el valor en %rax.
-            // Ahora nosotros lo guardamos en la posición lineal que toca.
-            
-            // ✅ NUEVO: Verificar si es string
             if (e->type == STRING) {
-                // Para strings, %rax ya tiene la DIRECCIÓN del string (leaq)
-                // La guardamos directamente como puntero
-                out << " movq %rax, "
-                    << (env.lookup(currentArray) - currentArrayIndex * 8)
-                    << "(%rbp)  # String ptr [" << currentArrayIndex << "]" << endl;
+                out << " movq %rax, " << (env.lookup(currentArray) - currentArrayIndex * 8) << "(%rbp)  # String ptr [" << currentArrayIndex << "]" << endl;
             }
             else {
-                // Para int/bool, %rax tiene el VALOR
-                out << " movq %rax, "
-                    << (env.lookup(currentArray) - currentArrayIndex * 8)
-                    << "(%rbp)  # Valor [" << currentArrayIndex << "]" << endl;
+                out << " movq %rax, " << (env.lookup(currentArray) - currentArrayIndex * 8) << "(%rbp)  # Valor [" << currentArrayIndex << "]" << endl;
             }
-            
-            // Incrementamos el índice lineal global
             currentArrayIndex++;
         }
-        
-        // NOTA: Si e->type == ARRAY, NO incrementamos currentArrayIndex aquí,
-        // porque la llamada recursiva (e->accept) ya incrementó el índice 
-        // por cada numerito que encontró dentro de ese sub-array.
     }
     return 0;
 }
 
 int GenCodeVisitor::visit(AssignArrayStm *stm)
 {
-    // 1. Verificaciones (Igual que en Access)
     if (!env.check(stm->id)) {
         cerr << "Error: Array " << stm->id << " no definido" << endl;
         return 0;
@@ -554,16 +483,10 @@ int GenCodeVisitor::visit(AssignArrayStm *stm)
 
     vector<int> dims = info.dimensions;
 
-    // ---------------------------------------------------------
-    // PASO 1: Calcular la dirección de memoria (Igual que Access)
-    // ---------------------------------------------------------
-    
     out << " # Calculando dirección para asignación en " << stm->id << endl;
 
-    // Primer índice
     stm->indices[0]->accept(this);
 
-    // Bucle para dimensiones extra (si las hay)
     for (size_t i = 1; i < stm->indices.size(); i++) {
         out << " pushq %rax" << endl;
         stm->indices[i]->accept(this);
@@ -573,33 +496,11 @@ int GenCodeVisitor::visit(AssignArrayStm *stm)
         out << " addq %rcx, %rax" << endl;
     }
 
-    // Calcular offset final en bytes
     out << " imulq $-8, %rax" << endl;        // * -8 (stack negativo)
     out << " addq $" << baseOffset << ", %rax" << endl; // + base
-
-    // HASTA AQUÍ ES IGUAL QUE ACCESS. 
-    // Ahora %rax tiene la dirección de memoria (el offset respecto a %rbp).
-
-    // ---------------------------------------------------------
-    // PASO 2: Guardar la dirección y calcular el valor
-    // ---------------------------------------------------------
-
-    // IMPORTANTE: Guardamos la dirección calculada en la pila porque 
-    // stm->value->accept(this) va a sobreescribir %rax con el resultado de la expresión.
     out << " pushq %rax  # Guardamos la dirección de destino" << endl;
-
-    // Evaluamos la expresión de la derecha (el valor a asignar)
     stm->value->accept(this);
-    // Ahora %rax tiene el VALOR (ej: 5, o resultado de una suma)
-
-    // ---------------------------------------------------------
-    // PASO 3: Realizar la asignación
-    // ---------------------------------------------------------
-
-    // Recuperamos la dirección guardada en un registro temporal (%rcx)
     out << " popq %rcx   # Recuperamos la dirección de destino" << endl;
-
-    // Movemos el valor (%rax) a la dirección de memoria (%rcx + %rbp)
     out << " movq %rax, (%rbp, %rcx) # Asignación final" << endl;
 
     return 0;
@@ -607,7 +508,6 @@ int GenCodeVisitor::visit(AssignArrayStm *stm)
 
 int GenCodeVisitor::visit(ArrayAccessExp *exp)
 {
-    // 1. Verificaciones y búsqueda de información (Igual que antes)
     if (!env.check(exp->id)) {
         cerr << "Error: Array " << exp->id << " no definido" << endl;
         return 0;
@@ -624,50 +524,19 @@ int GenCodeVisitor::visit(ArrayAccessExp *exp)
     vector<int> dims = info.dimensions;
 
     out << " # Acceso unificado a " << exp->id << endl;
-
-    // ---------------------------------------------------------
-    // PASO 1: Calcular el primer índice (siempre existe)
-    // ---------------------------------------------------------
     exp->indices[0]->accept(this);
-    // En este punto, %rax tiene el valor del primer índice (i0)
 
-    // ---------------------------------------------------------
-    // PASO 2: Bucle para dimensiones adicionales (Horner's Method)
-    // ---------------------------------------------------------
-    // Si es 1D (size=1), este bucle NO se ejecuta (i=1 < 1 es falso).
-    // Si es 2D o más, entra y acumula: acc = (acc * dim_size) + index
-    
     for (size_t i = 1; i < exp->indices.size(); i++) {
-        // Guardamos el acumulado actual en la pila para evaluar el siguiente índice
         out << " pushq %rax" << endl;
-
-        // Evaluamos el siguiente índice (ej: j)
         exp->indices[i]->accept(this);
-
-        // El resultado del nuevo índice está en %rax, lo movemos a %rcx temporalmente
         out << " movq %rax, %rcx" << endl;
-
-        // Recuperamos el acumulado anterior
         out << " popq %rax" << endl;
-
-        // Aplicamos la fórmula: (Acumulado * TamañoDimensión) + NuevoÍndice
         out << " imulq $" << dims[i] << ", %rax" << endl;
         out << " addq %rcx, %rax" << endl;
     }
-
-    // ---------------------------------------------------------
-    // PASO 3: Cálculo final de memoria (Igual para todos)
-    // ---------------------------------------------------------
-    
-    // Multiplicar por -8 (Bytes por elemento + dirección negativa de stack)
     out << " imulq $-8, %rax" << endl;
-    
-    // Sumar la base (que ya es un número negativo, ej: -8)
     out << " addq $" << baseOffset << ", %rax" << endl;
-    
-    // Cargar el valor final
     out << " movq (%rbp,%rax), %rax" << endl;
-
     return 0;
 }
 
@@ -702,7 +571,6 @@ int GenCodeVisitor::visit(FieldAccessExp* exp) {
 }
 
 int GenCodeVisitor::visit(StructDec* stm) {
-    // No runtime code for struct definitions
     return 0;
 }
 
@@ -752,12 +620,10 @@ int GenCodeVisitor::visit(TernaryExp *exp) {
 ///////////////////////////////////////////////////////////////////////////////////
 
 int TypeCheckerVisitor::type(Program *program) {
-    // First collect struct definitions
     for (auto s : program->sdlist) {
         s->accept(this);
     }
 
-    // Then type-check functions (bodies use those struct types)
     for(auto i: program->fdlist) {
         i->accept(this);
     }
@@ -785,7 +651,7 @@ int TypeCheckerVisitor::visit(Body *body) {
     cout << "[TC DEBUG] Num statements: " << body->StmList.size() << endl;
     
     typeEnv.add_level();
-    structTypeEnv.add_level();  // In case of struct declarations, add level per name of struct.
+    structTypeEnv.add_level();
 
     for (auto i : body->declarations) {
         cout << "[TC DEBUG] Procesando declaración..." << endl;
@@ -797,40 +663,11 @@ int TypeCheckerVisitor::visit(Body *body) {
         i->accept(this);
     }
 
-    structTypeEnv.remove_level(); // After execution always lower a level.
+    structTypeEnv.remove_level();
     typeEnv.remove_level();
     cout << "[TC DEBUG] Body - fin, locales=" << locales << endl;
     return 0;
 }
-
-
-// int TypeCheckerVisitor::visit(VarDec *vd) {
-//     Type type = UNDEFINED;
-//
-//     if (vd->type == "int") type = INT;
-//     else if (vd->type == "bool") type = BOOL;
-//     else if (vd->type == "string") type = STRING;
-//     // else: could be a struct type name
-//
-//     int wordsPerVar = 1;
-//
-//     // If this is a struct type, its size is number of fields
-//     auto it = structDefs.find(vd->type);
-//     if (it != structDefs.end()) {
-//         wordsPerVar = static_cast<int>(it->second.size());
-//     }
-//
-//     for (auto &v : vd->vars) {
-//         typeEnv.add_var(v, type);       // basic kind (INT/BOOL/STRING/UNDEFINED)
-//         if (structDefs.count(vd->type)) {
-//             structTypeEnv.add_var(v, vd->type);
-//         }
-//         locales += wordsPerVar;
-//     }
-//
-//     return 0;
-// }
-
 
 int TypeCheckerVisitor::visit(IfStm *stm) {
     int a = locales;
@@ -992,8 +829,6 @@ int TypeCheckerVisitor::visit(ArrayDec* ad) {
     cout << "[TC DEBUG] ArrayDec: totalSize=" << totalSize << endl;
     locales += totalSize;
     cout << "[TC DEBUG] ArrayDec: locales incrementado a " << locales << endl;
-    // 4. GUARDAR EN EL ENTORNO (¡Faltaba esto!)
-    // Esto es vital para que luego sepamos que arr[0] es un STRING
     ArrayInfo info = {currentDims, totalSize, 0, baseType};
     arrayEnv.add_var(ad->id, info);
 
@@ -1010,15 +845,12 @@ int TypeCheckerVisitor::visit(AssignArrayStm *stm)
 }
 
 int TypeCheckerVisitor::visit(ArrayAccessExp *exp) {
-    // 1. Visitar índices
     for(auto idx : exp->indices) {
         idx->accept(this);
     }
 
-    // 2. RECUPERAR EL TIPO (¡Faltaba esto!)
     ArrayInfo info;
     if (arrayEnv.lookup(exp->id, info)) {
-        // Le decimos al nodo: "Tú eres del tipo que diga tu array"
         exp->type = info.baseType;
     } else {
         exp->type = UNDEFINED;

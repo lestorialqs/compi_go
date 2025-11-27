@@ -125,9 +125,6 @@ VarDec* Parser::parseVarDec() {
     match(Token::ID);
     string id = previous->text;
 
-    // -------------------------------------------------------
-    //         ¿VIENEN DIMENSIONES?  →  ES ARRAY
-    // -------------------------------------------------------
     vector<Exp*> dims;
 
     while (match(Token::LBRACK)) {
@@ -136,19 +133,15 @@ VarDec* Parser::parseVarDec() {
         match(Token::RBRACK);
     }
 
-    // Si dims NO está vacío → ArrayDec
     if (!dims.empty()) {
         // Ahora debe venir el tipo
         match(Token::ID);
         string type = previous->text;
 
-        // --------------------------------------
-        // ¿Hay inicializador? (= ArrayLiteral)
-        // --------------------------------------
         ArrayLiteralExp* init = nullptr;
 
         if (match(Token::ASSIGN)) {
-            init = parseArrayLiteral();  // <-- función nueva
+            init = parseArrayLiteral();
         }
 
         match(Token::SEMICOL);
@@ -166,9 +159,6 @@ VarDec* Parser::parseVarDec() {
         return arr;
     }
 
-    // -------------------------------------------------------
-    //     CASO CONTRARIO ES SimpleVarDec (NO ARRAY)
-    // -------------------------------------------------------
     SimpleVarDec* vd = new SimpleVarDec();
     vd->vars.push_back(id);
 
@@ -304,7 +294,6 @@ Stm* Parser::parseStm() {
     if(match(Token::ID)){
         variable = previous->text;
 
-        // ---  acceso array --- //
         if (check(Token::LBRACK)) {
             vector<Exp*> idx = parseArrayIndices();
 
@@ -315,11 +304,9 @@ Stm* Parser::parseStm() {
                 stm->id = variable;
                 stm->indices = idx;
                 stm->value = val;
-                return stm;  // <-- FALTABA ESTO
+                return stm;
             }
-
         }
-
 
         if (match(Token::ASSIGN)) {
             e = parseCE();
