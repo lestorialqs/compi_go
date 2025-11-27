@@ -4,7 +4,10 @@ package main;
 import "fmt";
 
 func main() {
-	(COMPLETAR)
+	var numeros [3]int = [3]int { 1,2,3 };
+	numeros[1] = numeros[1] * 2;
+
+	fmt.Println(numeros[1])
 }
 
-// Expected output:
+// Expected output: 4

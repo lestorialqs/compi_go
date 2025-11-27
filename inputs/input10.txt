@@ -4,7 +4,14 @@ package main;
 import "fmt";
 
 func main() {
-	(COMPLETAR)
+    var res int;
+	var num [2][2]int = [2][2]int {
+    	{1, 2},
+    	{3, 4}
+    };
+
+    res = num[0][0] + num[0][1];
+    fmt.Println(res)
 }
 
-// Expected output:
+// Expected output: 3

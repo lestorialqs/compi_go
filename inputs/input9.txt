@@ -4,7 +4,12 @@ package main;
 import "fmt";
 
 func main() {
-	(COMPLETAR)
+	var nombres [2][2]string = [2][2]string {
+    	{"Alice","Bob"},
+    	{"Charlie","Diana"}
+    };
+
+    fmt.Println(nombres[0][1]);
 }
 
-// Expected output:
+// Expected output: Bob
